@@ -77,7 +77,7 @@ namespace NppScripts
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.Message, "Notepad++ Scripts");
+                    MessageBox.Show(e.Message, "Notepad++ Automation");
                 }
                 return true;
             }
@@ -147,7 +147,7 @@ namespace NppScripts
             }
             catch
             {
-                MessageBox.Show("CS-Script Output Panel cannot be found.\nPlease ensure you have CS-Script Plugin installed.", "Notepad++ Scripts");
+                MessageBox.Show("CS-Script Output Panel cannot be found.\nPlease ensure you have CS-Script Plugin installed.", "Notepad++ Automation");
             }
             return null;
         }
@@ -265,7 +265,7 @@ namespace NppScripts
             }
             catch (UnauthorizedAccessException)
             {
-                if (DialogResult.Yes == MessageBox.Show("The Script is locked. Restarting Notepad++ will release it.\nDo you want to restart it now?", "Notepad++ Scripts", MessageBoxButtons.YesNo))
+                if (DialogResult.Yes == MessageBox.Show("The Script is locked. Restarting Notepad++ will release it.\nDo you want to restart it now?", "Notepad++ Automation", MessageBoxButtons.YesNo))
                 {
                     var proc = System.Diagnostics.Process.GetProcessById(55);
                     ScriptManager.RestartNpp();
@@ -273,7 +273,7 @@ namespace NppScripts
             }
             catch (Exception e)
             {
-                //MessageBox.Show("Script '" + file + "' is invalid.\n" + e.Message, "Notepad++ Scripts");
+                //MessageBox.Show("Script '" + file + "' is invalid.\n" + e.Message, "Notepad++ Automation");
                 CSScriptIntegration.ShowBuildError("Script '" + file + "' is invalid.\n" + e.Message);
             }
 

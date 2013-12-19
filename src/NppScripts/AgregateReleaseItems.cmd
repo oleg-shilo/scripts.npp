@@ -1,9 +1,8 @@
 echo off
 md "..\..\bin\Plugins\NppScripts"
-md "..\..\bin\Scripts"
+md "..\..\bin\Samples"
 md "%programfiles%\Notepad++\plugins\NppScripts"
 
-echo 1...
 copy "bin\Release\NppScripts.dll" "%programfiles%\Notepad++\plugins\NppScripts.dll"
 copy "bin\Release\NppScripts.xml" "%programfiles%\Notepad++\plugins\NppScripts.xml"
 copy "bin\Release\NppScripts\*.dll" "%programfiles%\Notepad++\plugins\NppScripts"
@@ -17,11 +16,8 @@ copy "bin\release\NppScripts\*.dll" "..\..\bin\Plugins\NppScripts"
 copy "bin\release\NppScripts\*.exe" "..\..\bin\Plugins\NppScripts"
 copy "bin\release\NppScripts\*.xml" "..\..\bin\Plugins\NppScripts"
 
+copy "%userprofile%\Documents\NppScripts\*.cs" "..\..\bin\Samples"
 
-echo 3...
-copy "%userprofile%\Documents\NppScripts\*.cs" "..\..\bin\Scripts"
-
-echo 4...
 copy "..\..\readme.txt" "..\..\bin\readme.txt"
 copy "..\..\license.txt" "..\..\bin\license.txt"
 

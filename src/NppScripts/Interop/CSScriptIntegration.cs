@@ -80,7 +80,7 @@ namespace NppScripts
             if (BuildOutputWriteLine != null)
                 CSScriptIntegration.BuildOutputWriteLine(error);
             else
-                MessageBox.Show(error, "Notepad++ Scripts");
+                MessageBox.Show(error, "Notepad++ Automation");
         }
 
         static public void ClearBuildError()
@@ -131,7 +131,7 @@ namespace NppScripts
             if (Plugin.IsNppScript(script))
             {
                 Npp.GetCurrentDocument();
-                MessageBox.Show("Notepad++ scripts cannot be debugged from Notepad++.\nTry to attach Visual Studio or inject Debug.Assert in the script code.");
+                MessageBox.Show("Notepad++ scripts cannot be debugged from Notepad++.\nTry to attach Visual Studio or inject Debug.Assert in the script code.", "Notepad++ Automation");
             }
             else
             {
@@ -151,12 +151,12 @@ namespace NppScripts
                 {
                     if (!Plugin.ExecuteScriptByFileName(script))
                     {
-                        MessageBox.Show("The selected script is not loaded yet. You need to restart Notepad++ in order the changes to take affect.", "Notepad++ Scripts");
+                        MessageBox.Show("The selected script is not loaded yet. You need to restart Notepad++ in order the changes to take affect.", "Notepad++ Automation");
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error: " + ex, "Notepad++ Scripts");
+                    MessageBox.Show("Error: " + ex, "Notepad++ Automation");
                 }
         }
     }

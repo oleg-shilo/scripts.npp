@@ -75,7 +75,7 @@ namespace NppScripts
             {
                 if (SelectedScript.IsSeparator)
                 {
-                    MessageBox.Show("Selected item is not a script.", "Notepad++ Scripts");
+                    MessageBox.Show("Selected item is not a script.", "Notepad++ Automation");
                 }
                 else
                     try
@@ -84,7 +84,7 @@ namespace NppScripts
 
                         if (!Plugin.ExecuteScriptByFileName(SelectedScript.File))
                         {
-                            if (DialogResult.Yes == MessageBox.Show("The selected script is not loaded yet. You need to restart Notepad++ in order the changes to take affect.\nDo you want to restart it now?", "Notepad++ Scripts", MessageBoxButtons.YesNo))
+                            if (DialogResult.Yes == MessageBox.Show("The selected script is not loaded yet. You need to restart Notepad++ in order the changes to take affect.\nDo you want to restart it now?", "Notepad++ Automation", MessageBoxButtons.YesNo))
                             {
                                 Application.DoEvents();
                                 reloadBtn.PerformClick();
@@ -93,11 +93,11 @@ namespace NppScripts
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error: " + ex, "Notepad++ Scripts");
+                        MessageBox.Show("Error: " + ex, "Notepad++ Automation");
                     }
             }
             else
-                MessageBox.Show("Please select the script to be executed.", "Notepad++ Scripts");
+                MessageBox.Show("Please select the script to be executed.", "Notepad++ Automation");
         }
 
         void scriptsList_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -167,7 +167,7 @@ namespace NppScripts
                 string scriptFile = SelectedScript.File;
                 try
                 {
-                    if (DialogResult.Yes == MessageBox.Show("You are about to delete '" + scriptFile + "'\nDo you want to proceed?", "Notepad++ Scripts", MessageBoxButtons.YesNo))
+                    if (DialogResult.Yes == MessageBox.Show("You are about to delete '" + scriptFile + "'\nDo you want to proceed?", "Notepad++ Automation", MessageBoxButtons.YesNo))
                     {
                         File.Delete(scriptFile);
                         refreshBtn.PerformClick();
@@ -179,7 +179,7 @@ namespace NppScripts
                 }
             }
             else
-                MessageBox.Show("Please select the script to be executed.", "Notepad++ Scripts");
+                MessageBox.Show("Please select the script to be executed.", "Notepad++ Automation");
         }
 
         const string defaultScriptCode =
@@ -215,7 +215,7 @@ public class Script : NppScript
             {
                 if (SelectedScript.IsSeparator)
                 {
-                    MessageBox.Show("Selected item is not a script.", "Notepad++ Scripts");
+                    MessageBox.Show("Selected item is not a script.", "Notepad++ Automation");
                 }
                 else
                     try
@@ -225,11 +225,11 @@ public class Script : NppScript
 
                         CSScript.Compile(SelectedScript.File, null, false, typeof(NppScript).Assembly.Location);
 
-                        MessageBox.Show("Success", "Notepad++ Scripts");
+                        MessageBox.Show("Success", "Notepad++ Automation");
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.Message, "Notepad++ Scripts");
+                        MessageBox.Show(ex.Message, "Notepad++ Automation");
                     }
             }
         }
@@ -303,15 +303,17 @@ public class Script : NppScript
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Notepad++ Scripts");
+                    MessageBox.Show(ex.Message, "Notepad++ Automation");
                 }
             }
             else
-                MessageBox.Show("Please select the script to be opened in Visual Studio.", "Notepad++ Scripts");
+                MessageBox.Show("Please select the script to be opened in Visual Studio.", "Notepad++ Automation");
         }
 
         private void aboutBtn_Click(object sender, EventArgs e)
         {
+            using (var dialog = new AboutBox())
+                dialog.ShowDialog();
         }
 
         private void hlpBtn_Click(object sender, EventArgs e)
