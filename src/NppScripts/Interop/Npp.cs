@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace NppScripts
 {
     /// <summary>
-    /// This class contains very generic wrappers for basic Notepad++ functionality. 
+    /// This class contains very generic wrappers for basic Notepad++ functionality.
     /// </summary>
     public class Npp
     {
@@ -109,6 +109,32 @@ namespace NppScripts
         }
 
         /// <summary>
+        /// Get text before caret.
+        /// </summary>
+        /// <param name="maxLength">The maximum length.</param>
+        /// <returns></returns>
+        static public string TextBeforeCaret(int maxLength = 512)
+        {
+            int bufCapacity = maxLength + 1;
+            IntPtr hCurrentEditView = Plugin.GetCurrentScintilla();
+            int currentPos = (int)Win32.SendMessage(hCurrentEditView, SciMsg.SCI_GETCURRENTPOS, 0, 0);
+            int beginPos = currentPos - maxLength;
+            int startPos = (beginPos > 0) ? beginPos : 0;
+            int size = currentPos - startPos;
+
+            if (size > 0)
+            {
+                using (var tr = new Sci_TextRange(startPos, currentPos, bufCapacity))
+                {
+                    Win32.SendMessage(hCurrentEditView, SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
+                    return tr.lpstrText;
+                }
+            }
+            else
+                return null;
+        }
+
+        /// <summary>
         /// Gets the word at cursor.
         /// </summary>
         /// <param name="point">The point - start and end position of the word.</param>
@@ -201,32 +227,6 @@ namespace NppScripts
             if (size > 0)
             {
                 using (var tr = new Sci_TextRange(startPos, endPos, bufCapacity))
-                {
-                    Win32.SendMessage(sci, SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
-                    return tr.lpstrText;
-                }
-            }
-            else
-                return null;
-        }
-
-        /// <summary>
-        /// Texts the before the current caret position.
-        /// </summary>
-        /// <param name="maxLength">The maximum length.</param>
-        /// <returns></returns>
-        static public string TextBeforeCaret(int maxLength = 512)
-        {
-            int bufCapacity = maxLength + 1;
-            IntPtr sci = Npp.CurrentScintilla;
-            int currentPos = (int)Win32.SendMessage(sci, SciMsg.SCI_GETCURRENTPOS, 0, 0);
-            int beginPos = currentPos - maxLength;
-            int startPos = (beginPos > 0) ? beginPos : 0;
-            int size = currentPos - startPos;
-
-            if (size > 0)
-            {
-                using (var tr = new Sci_TextRange(startPos, currentPos, bufCapacity))
                 {
                     Win32.SendMessage(sci, SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
                     return tr.lpstrText;

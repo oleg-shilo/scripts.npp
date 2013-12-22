@@ -50,7 +50,7 @@ namespace NppScripts
         }
     }
 
-    public static class Product
+    internal static class Product
     {
         internal static string HomeUrl = "http://csscript.net/npp/csscript.html";
 
