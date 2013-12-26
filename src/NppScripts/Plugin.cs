@@ -15,10 +15,7 @@ using CSScriptLibrary;
 
 /*
  TODO:
- * + check version of CSScriptNpp.dll during the integration stage 
- * + On script errors output into CSScriptNpp output panel if available
  * XML Documentation for Npp.Members
- * + Sample scripts
  */
 namespace NppScripts
 {
