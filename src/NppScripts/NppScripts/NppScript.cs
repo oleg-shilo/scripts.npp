@@ -179,7 +179,7 @@ namespace NppScripts
             /*
             //npp_tag OutputPanel
             //npp_toolbar_image Shell32.dll|3
-            //npp_shortcut Ctrl+Alt+Shift+F12
+            //npp_shortcut Ctrl+Alt+Shift+F10
             */
             if (data.StartsWith("//npp_toolbar_image "))
             {

@@ -9,6 +9,7 @@ cd Samples
 
 cd ..
 "C:\Program Files\7-Zip\7z.exe" a -x!package.txt NppScripts.zip *.txt Plugins
+"C:\Program Files\7-Zip\7z.exe" a -t7z NppScripts.7z *.txt Plugins
 
 cscs /l setup
 cscs /l package
