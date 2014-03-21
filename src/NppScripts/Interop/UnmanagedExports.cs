@@ -45,27 +45,31 @@ namespace NppScripts
         [DllExport(CallingConvention = CallingConvention.Cdecl)]
         static void beNotified(IntPtr notifyCode)
         {
-            SCNotification nc = (SCNotification)Marshal.PtrToStructure(notifyCode, typeof(SCNotification));
-            if (nc.nmhdr.code == (uint)NppMsg.NPPN_TBMODIFICATION)
+            try
             {
-                Plugin.FuncItems.RefreshItems();
-                Plugin.RefreshToolbarImages();
-            }
-            else if (nc.nmhdr.code == (uint)SciMsg.SCN_CHARADDED)
-            {
-            }
-            else if (nc.nmhdr.code == (uint)NppMsg.NPPN_READY)
-            {
-                CSScriptIntegration.Initialize();
-                Plugin.InitView();
-            }
-            else if (nc.nmhdr.code == (uint)NppMsg.NPPN_SHUTDOWN)
-            {
-                Marshal.FreeHGlobal(_ptrPluginName);
-                Plugin.CleanUp();
-            }
+                SCNotification nc = (SCNotification)Marshal.PtrToStructure(notifyCode, typeof(SCNotification));
+                if (nc.nmhdr.code == (uint)NppMsg.NPPN_TBMODIFICATION)
+                {
+                    Plugin.FuncItems.RefreshItems();
+                    Plugin.RefreshToolbarImages();
+                }
+                else if (nc.nmhdr.code == (uint)SciMsg.SCN_CHARADDED)
+                {
+                }
+                else if (nc.nmhdr.code == (uint)NppMsg.NPPN_READY)
+                {
+                    CSScriptIntegration.Initialize();
+                    Plugin.InitView();
+                }
+                else if (nc.nmhdr.code == (uint)NppMsg.NPPN_SHUTDOWN)
+                {
+                    Marshal.FreeHGlobal(_ptrPluginName);
+                    Plugin.CleanUp();
+                }
 
-            Plugin.OnNotification(nc);
+                Plugin.OnNotification(nc);
+            }
+            catch { }//this is indeed the last line of defense as all CS-S calls have the error handling inside 
         }
     }
 }
