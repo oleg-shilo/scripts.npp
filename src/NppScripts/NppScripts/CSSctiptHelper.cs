@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Windows.Forms;
 
 #pragma warning disable 1591
 
@@ -44,7 +43,6 @@ namespace NppScripts
             string refAsmsXml = string.Join(Environment.NewLine,
                                             refAsms.Select(file => "<Reference Include=\"" + Path.GetFileNameWithoutExtension(file) + "\"><HintPath>" + file + "</HintPath></Reference>").ToArray());
 
-
             File.WriteAllText(projectFile,
                               Resources.Resources.VS2010ProjectTemplate
                                                   .Replace("{$SOURCES}", sourceFilesXml)
@@ -54,6 +52,54 @@ namespace NppScripts
 
         static public void ClearVSDir()
         {
+            foreach (var dir in Directory.GetDirectories(VsDir))
+            {
+            }
+        }
+
+        static bool IsInUseByExternalProcess(string dir)
+        {
+            string pidStr = Path.GetFileName(dir);
+
+            try
+            {
+                int id = int.Parse(pidStr);
+                if (Process.GetProcessById(id) != null)
+                    return true; //the process using this project is still active
+            }
+            catch { }
+            return false;
+        }
+
+        static void DeleteDir(string dir)
+        {
+            //deletes directory recursively
+            try
+            {
+                foreach (string file in Directory.GetFiles(dir))
+                    DeleteFile(file);
+
+                foreach (string subDir in Directory.GetDirectories(dir))
+                    DeleteDir(subDir);
+
+                if (Directory.GetFiles(dir).Length == 0 && Directory.GetDirectories(dir).Length == 0)
+                    Directory.Delete(dir);
+            }
+            catch
+            {
+            }
+        }
+
+        static void DeleteFile(string file)
+        {
+            try
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+            catch
+            {
+            }
         }
 
         static string vsDir;
