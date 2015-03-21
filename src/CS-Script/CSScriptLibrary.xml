@@ -54,6 +54,8 @@
             </summary>
             <param name="name">'namespace'/assembly(file) name</param>
             <param name="searchDirs">Assembly search directories</param>
+            <para>If the default implementation isn't suitable then you can set <c>CSScript.FindAssemblyAlgorithm</c> 
+            to the alternative implementation of the probing algorithm.</para>
             <returns>collection of assembly file names where namespace is implemented</returns>
         </member>
         <member name="M:CSScriptLibrary.AssemblyResolver.FindLocalAssembly(System.String,System.String)">
@@ -151,6 +153,43 @@
             Enables omitting closing character (";") for CS-Script directives (e.g. "//css_ref System.Xml.dll" instead of "//css_ref System.Xml.dll;").
             </summary>
         </member>
+        <member name="M:csscript.CSharpParser.EscapeDirectiveDelimiters(System.String)">
+            <summary>
+            Escapes the CS-Script directive (e.g. //css_*) delimiters.
+            <para>All //css_* directives should escape any internal CS-Script delimiters by doubling the delimiter character. 
+            For example //css_include for 'script(today).cs' should escape brackets as they are the directive delimiters. 
+            The correct syntax would be as follows '//css_include script((today)).cs;'</para>
+            <remarks>The delimiters characters are ';,(){}'.
+            <para>However you should check <see cref="T:csscript.CSharpParser.DirectiveDelimiters"/> for the accurate list of all delimiters.
+            </para> 
+            </remarks>
+            </summary>
+            <param name="text">The text to be processed.</param>
+            <returns></returns>
+        </member>
+        <member name="M:csscript.CSharpParser.UnescapeDirectiveDelimiters(System.String)">
+            <summary>
+            Unescapes the CS-Script directive (e.g. //css_*) delimiters.
+            <para>All //css_* directives should escape any internal CS-Script delimiters by doubling the delimiter character. 
+            For example //css_include for 'script(today).cs' should escape brackets as they are the directive delimiters. 
+            The correct syntax would be as follows '//css_include script((today)).cs;'</para>
+            <remarks>The delimiters characters are ';,(){}'.
+            <para>However you should check <see cref="T:csscript.CSharpParser.DirectiveDelimiters"/> for the accurate list of all delimiters.
+            </para> 
+            </remarks>
+            </summary>
+            <param name="text">The text to be processed.</param>
+            <returns></returns>
+        </member>
+        <member name="F:csscript.CSharpParser.DirectiveDelimiters">
+            <summary>
+            The //css_* directive delimiters. 
+            <remarks>All //css_* directives should escape any internal CS-Script delimiters by doubling the delimiter character. 
+            For example //css_include for 'script(today).cs' should escape brackets as they are the directive delimiters. 
+            The correct syntax would be as follows '//css_include script((today)).cs;'
+            </remarks>
+            </summary>
+        </member>
         <member name="P:csscript.CSharpParser.Args">
             <summary>
             Embedded script arguments. The both script and engine arguments are allowed except "/noconfig" engine command line switch.
@@ -201,6 +240,11 @@
             References to the namespaces.
             </summary>
         </member>
+        <member name="P:csscript.CSharpParser.NuGets">
+            <summary>
+            References to the NuGet packages.
+            </summary>
+        </member>
         <member name="P:csscript.CSharpParser.Imports">
             <summary>
             C# scripts to be imported.
@@ -211,9 +255,14 @@
             Pre- and post-execution scripts.
             </summary>
         </member>
+        <member name="P:csscript.CSharpParser.Inits">
+            <summary>
+            Script initialization directives.
+            </summary>
+        </member>
         <member name="P:csscript.CSharpParser.ThreadingModel">
             <summary>
-            Appartment state of the script.
+            Apartment state of the script.
             </summary>
         </member>
         <member name="P:csscript.CSharpParser.Code">
@@ -259,6 +308,32 @@
             If set to 'true' parent script will be aborted on pre/post-script error, otherwise the error will be ignored.
             </summary>
         </member>
+        <member name="T:csscript.CSharpParser.InitInfo">
+            <summary>
+            Class to hold the script initialization information.
+            </summary>
+        </member>
+        <member name="F:csscript.CSharpParser.InitInfo.CoInitializeSecurity">
+            <summary>
+            The boolean flag indicating if CoInitializeSecurity (with default parameters) should be called at the start of the script execution.
+            </summary>
+        </member>
+        <member name="F:csscript.CSharpParser.InitInfo.RpcImpLevel">
+            <summary>
+            The RpcImpLevel of CoInitializeSecurity arguments
+            </summary>
+        </member>
+        <member name="F:csscript.CSharpParser.InitInfo.EoAuthnCap">
+            <summary>
+            The EoAuthnCap of CoInitializeSecurity arguments
+            </summary>
+        </member>
+        <member name="M:csscript.CSharpParser.InitInfo.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:csscript.CSharpParser.InitInfo"/> class.
+            </summary>
+            <param name="statement">The original argument statement of the <c>//css_init</c> directive.</param>
+        </member>
         <member name="T:csscript.CSharpParser.ImportInfo">
             <summary>
             Class to hold the script importing information, which actually controls how script is imported.
@@ -285,6 +360,23 @@
             <summary>
             If set to 'true' "static...Main" in the imported script is not renamed.
             </summary>
+        </member>
+        <member name="T:csscript.ResolveSourceFileHandler">
+            <summary>
+            Delegate implementing source file probing algorithm.
+            </summary>
+            <param name="file">The file.</param>
+            <param name="searchDirs">The extra dirs.</param>
+            <param name="throwOnError">if set to <c>true</c> [throw on error].</param>
+            <returns></returns>
+        </member>
+        <member name="T:csscript.ResolveAssemblyHandler">
+            <summary>
+            Delegate implementing assembly file probing algorithm.
+            </summary>
+            <param name="file">The file.</param>
+            <param name="searchDirs">The extra dirs.</param>
+            <returns></returns>
         </member>
         <member name="T:csscript.CSExecutor">
             <summary>
@@ -455,7 +547,7 @@
         </member>
         <member name="M:csscript.CompilerException.Create(System.CodeDom.Compiler.CompilerErrorCollection,System.Boolean)">
             <summary>
-            Creates the CompilerException instance from the specified compiler errors errors.
+            Creates the CompilerException instance from the specified compiler errors.
             </summary>
             <param name="Errors">The compiler errors.</param>
             <param name="hideCompilerWarnings">if set to <c>true</c> hide compiler warnings.</param>
@@ -499,6 +591,18 @@
             with throwOnError flag set to true.
             </summary>
         </member>
+        <member name="F:CSScriptLibrary.FileParser.ResolveFileAlgorithm">
+            <summary>
+            The resolve file algorithm,
+            <para>
+            The default algorithm searches for script file by given script name. Search order:
+            1. Current directory
+            2. extraDirs (usually %CSSCRIPT_DIR%\Lib and ExtraLibDirectory)
+            3. PATH
+            Also fixes file name if user did not provide extension for script file (assuming .cs extension)
+            </para>
+            </summary>
+        </member>
         <member name="M:CSScriptLibrary.FileParser.ResolveFile(System.String,System.String[],System.Boolean)">
             <summary>
             Searches for script file by given script name. Search order:
@@ -506,6 +610,8 @@
             2. extraDirs (usually %CSSCRIPT_DIR%\Lib and ExtraLibDirectory)
             3. PATH
             Also fixes file name if user did not provide extension for script file (assuming .cs extension)
+            <para>If the default implementation isn't suitable then you can set <c>FileParser.ResolveFileAlgorithm</c> 
+            to the alternative implementation of the probing algorithm.</para>
             </summary>
         </member>
         <member name="T:CSScriptLibrary.FileParserComparer">
@@ -526,6 +632,17 @@
             <summary>
             ApartmentState of a script during the execution (default: ApartmentState.Unknown)
             </summary>
+        </member>
+        <member name="M:CSScriptLibrary.ScriptParser.ResolvePackages(System.Boolean)">
+            <summary>
+            Resolves the NuGet packages into assemblies to be referenced by the script.
+            <para>If the package was never installed/downloaded yet CS-Script runtime will try to download it.</para>
+            <para>CS-Script will also analyze the installed package structure in try to reference compatible assemblies
+            from the package.</para>
+            </summary>
+            <param name="suppressDownloading">if set to <c>true</c> suppresses downloading the NuGet package. 
+            Suppressing can be useful for the quick 'referencing' assessment.</param>
+            <returns>Collection of the referenced assembly files.</returns>
         </member>
         <member name="M:CSScriptLibrary.ScriptParser.#ctor(System.String)">
             <summary>
@@ -573,7 +690,7 @@
         </member>
         <member name="P:CSScriptLibrary.ScriptParser.FilesToCompile">
             <summary>
-            Collection of the files to be compiled (including dependant scripts)
+            Collection of the files to be compiled (including dependent scripts)
             </summary>
         </member>
         <member name="P:CSScriptLibrary.ScriptParser.ImportedFiles">
@@ -606,9 +723,19 @@
             Collection of namespaces, which if found in code, should not be resolved into referenced assembly.
             </summary>
         </member>
+        <member name="P:CSScriptLibrary.ScriptParser.Packages">
+            <summary>
+            Collection of the NuGet packages
+            </summary>
+        </member>
         <member name="P:CSScriptLibrary.ScriptParser.ReferencedAssemblies">
             <summary>
-            Collection of referenced asesemblies. All assemblies are referenced either from command-line, code or resolved from referenced namespaces.
+            Collection of referenced assemblies. All assemblies are referenced either from command-line, code or resolved from referenced namespaces.
+            </summary>
+        </member>
+        <member name="P:CSScriptLibrary.ScriptParser.ScriptPath">
+            <summary>
+            The path of the parsed script.
             </summary>
         </member>
         <member name="T:csscript.COM">
@@ -703,6 +830,11 @@
             scenarios the script file is a dependency file.</para>
             </summary>
         </member>
+        <member name="F:csscript.PrecompilationContext.NewIncludes">
+            <summary>
+            Collection of the new 'include' items (dependency source files). 
+            </summary>
+        </member>
         <member name="F:csscript.PrecompilationContext.NewSearchDirs">
             <summary>
             Collection of the assembly and script probing directories to be added to the process search directories.
@@ -713,6 +845,28 @@
             <summary>
             Collection of the process assembly and script probing directories.
             </summary>
+        </member>
+        <member name="T:csscript.AutoclassGenerator">
+            <summary>
+            AutoclassGenerator to be used by external applications for generating the auto-class from the classless scripts
+            </summary>
+        </member>
+        <member name="M:csscript.AutoclassGenerator.Process(System.String,System.Int32@,System.Int32@)">
+            <summary>
+            Processes the specified code.
+            </summary>
+            <param name="code">The code.</param>
+            <param name="injectionPos">The injection position.</param>
+            <param name="injectionLength">Length of the injection.</param>
+            <returns></returns>
+        </member>
+        <member name="M:csscript.AutoclassGenerator.Process(System.String,System.Int32@)">
+            <summary>
+            Processes the specified code.
+            </summary>
+            <param name="code">The code.</param>
+            <param name="position">The position.</param>
+            <returns></returns>
         </member>
         <member name="T:csscript.Settings">
             <summary>
@@ -837,7 +991,7 @@
         </member>
         <member name="P:csscript.Settings.DefaultRefAssemblies">
             <summary>
-            List of assembly names to be automatically referenced by the scripst. The items must be separated by coma or semicolon. Specifying .dll extension (e.g. System.Core.dll) is optional.
+            List of assembly names to be automatically referenced by the script. The items must be separated by coma or semicolon. Specifying .dll extension (e.g. System.Core.dll) is optional.
             Assembly can contain expandable environment variables.
             </summary>
         </member>
@@ -856,6 +1010,24 @@
             <summary>
             Path to the precompiller script/assembly (see documentation for details). You can specify multiple recompiles separating them by semicolon.
             </summary>
+        </member>
+        <member name="P:csscript.Settings.CustomHashing">
+            <summary>
+            Gets or sets a value indicating whether custom string hashing algorithm should be used.
+            <para>
+            String hashing is used by the script engine for allocating temporary and cached paths. 
+            However default string hashing is platform dependant (x32 vs. x64) what makes impossible 
+            truly deterministic string hashing. This in turns complicates the integration of the 
+            CS-Script infrastructure with the third-party applications (e.g. Notepad++ CS-Script plugin).
+            </para>
+            <para>
+            To overcome this problem CS-Script uses custom string hashing algorithm (default setting).
+            Though the native .NET hashing can be enabled if desired by setting <c>CustomHashing</c>
+            to <c>false</c>.</para>
+            </summary>
+            <value>
+              <c>true</c> if custom hashing is in use; otherwise, <c>false</c>.
+            </value>
         </member>
         <member name="P:csscript.Settings.ReportDetailedErrorInfo">
             <summary>
@@ -882,7 +1054,7 @@
             true - warnings will not be displayed
             </summary>
         </member>
-        <member name="P:csscript.Settings.InMemoryAsssembly">
+        <member name="P:csscript.Settings.InMemoryAssembly">
             <summary>
             Boolean flag that indicates the script assembly is to be loaded by CLR as an in-memory byte stream instead of the file.
             This setting can be useful when you need to prevent script assembly (compiled script) from locking by CLR during the execution.
@@ -910,6 +1082,14 @@
             <summary>
             Hide all auto-generated files including the files generated by pre/post scripts.
             </summary>
+        </member>
+        <member name="M:csscript.Utils.WaitForFileIdle(System.String,System.Int32)">
+            <summary>
+            Waits for file idle.
+            </summary>
+            <param name="file">The file.</param>
+            <param name="delay">The delay.</param>
+            <returns><c>true</c> if the wait is successful.</returns>
         </member>
         <member name="M:csscript.Utils.AddCompilerOptions(System.CodeDom.Compiler.CompilerParameters,System.String)">
             <summary>
@@ -1079,6 +1259,20 @@
             assemblies the interface depends in. </param>
             <returns>Interface object or <c>null</c> if alignment was unsuccessful.</returns>
         </member>
+        <member name="M:CSScriptLibraryExtensionMethods.TryAlignToInterface``1(System.Object,System.Boolean,System.String[])">
+            <summary>
+            Attempts to align (pseudo typecast) object to interface.
+            <para>The object does not necessarily need to implement the interface formally.</para>
+            <para>See <see cref="T:CSScriptLibrary.ThirdpartyLibraries.Rubenhak.Utils.ObjectCaster"/>.</para>
+            </summary>
+            <typeparam name="T">Interface definition to align with.</typeparam>
+            <param name="obj">The object to be aligned with the interface.</param>
+            <param name="useAppDomainAssemblies">If set to <c>true</c> uses all loaded assemblies of the current <see cref="T:System.AppDomain"/>
+            when emitting (compiling) aligned proxy object.</param>
+            <param name="refAssemblies">The string array containing file names to the additional dependency
+            assemblies the interface depends in. </param>
+            <returns>Interface object or <c>null</c> if alignment was unsuccessful.</returns>
+        </member>
         <member name="M:CSScriptLibraryExtensionMethods.AlignToInterface``1(System.Object,System.Boolean)">
             <summary>
             Aligns (pseudo typecasts) object to interface.
@@ -1099,7 +1293,21 @@
             </summary>
             <typeparam name="T">Interface definition to align with.</typeparam>
             <param name="obj">The object to be aligned with the interface.</param>
-            <param name="refAssemblies">The string array containing file nemes to the additional dependency
+            <param name="refAssemblies">The string array containing file names to the additional dependency
+            assemblies the interface depends in. </param>
+            <returns>Interface object.</returns>
+        </member>
+        <member name="M:CSScriptLibraryExtensionMethods.AlignToInterface``1(System.Object,System.Boolean,System.String[])">
+            <summary>
+            Aligns (pseudo typecasts) object to interface.
+            <para>The object does not necessarily need to implement the interface formally.</para>
+            <para>See <see cref="T:CSScriptLibrary.ThirdpartyLibraries.Rubenhak.Utils.ObjectCaster"/>.</para>
+            </summary>
+            <typeparam name="T">Interface definition to align with.</typeparam>
+            <param name="obj">The object to be aligned with the interface.</param>
+            <param name="useAppDomainAssemblies">If set to <c>true</c> uses all non-GAC loaded assemblies of the current <see cref="T:System.AppDomain"/>
+            when emitting (compiling) aligned proxy object.</param>
+            <param name="refAssemblies">The string array containing file names to the additional dependency
             assemblies the interface depends in. </param>
             <returns>Interface object.</returns>
         </member>
@@ -1218,7 +1426,7 @@
         </member>
         <member name="M:CSScriptLibrary.AsmHelper.GetStaticMethod(System.String,System.Object[])">
             <summary>
-            Specialised version of GetMethodInvoker which returns MethodDelegate thus you do not need to specify
+            Specialized version of GetMethodInvoker which returns MethodDelegate thus you do not need to specify
             object instance (null) when calling static methods.
             </summary>
             <param name="methodName">'Method' name including 'Type' name (eg. MyType.DoJob). It is allowed to use wild
@@ -1244,7 +1452,7 @@
         </member>
         <member name="M:CSScriptLibrary.AsmHelper.GetStaticMethodWithArgs(System.String,System.Type[])">
             <summary>
-            Specialised version of GetMethodInvoker which returns MethodDelegate thus you do not need to specify
+            Specialized version of GetMethodInvoker which returns MethodDelegate thus you do not need to specify
             object instance (null) when calling static methods.
             </summary>
             <param name="methodName">'Method' name including 'Type' name (eg. MyType.DoJob). It is allowed to use wild
@@ -1254,7 +1462,7 @@
         </member>
         <member name="M:CSScriptLibrary.AsmHelper.GetStaticMethod">
             <summary>
-            Specialised version of GetMethodInvoker which returns MethodDelegate of the very first method found in the
+            Specialized version of GetMethodInvoker which returns MethodDelegate of the very first method found in the
             underlying assembly. This method is an overloaded implementation of the GetStaticMethod(string methodName, params object[] list).
             <para>
             Use this method when script assembly contains only one single type with one method.
@@ -1264,7 +1472,7 @@
         </member>
         <member name="M:CSScriptLibrary.AsmHelper.GetMethod(System.Object,System.String,System.Object[])">
             <summary>
-            Specialised version of GetMethodInvoker which returns MethodDelegate thus you do not need to specify
+            Specialized version of GetMethodInvoker which returns MethodDelegate thus you do not need to specify
             object instance when calling instance methods as delegate will maintain the instance object internally.
             </summary>
             <param name="instance">Instance of the type, which implements method is to be wrapped by MethodDelegate.</param>
@@ -1294,7 +1502,7 @@
         <member name="M:CSScriptLibrary.AsmHelper.#ctor(System.String,System.String,System.Boolean)">
             <summary>
             Creates an instance of AsmHelper for working with assembly dynamically loaded to non-current AppDomain.
-            This method initialises instance and creates new ('remote') AppDomain with 'domainName' name. New AppDomain is automatically unloaded as result of "disposable" behaviour of AsmHelper.
+            This method initializes instance and creates new ('remote') AppDomain with 'domainName' name. New AppDomain is automatically unloaded as result of "disposable" behaviour of AsmHelper.
             </summary>
             <param name="asmFile">File name of the assembly to be loaded.</param>
             <param name="domainName">Name of the domain to be created.</param>
@@ -1318,6 +1526,43 @@
             to indicate that the Type name of the method is irrelevant (e.g. "*.Method" or even "*.*").</param>
             <param name="list">List of 'Method' arguments.</param>
             <returns>Returns object of the same type as 'Method' return type.</returns>
+        </member>
+        <member name="M:CSScriptLibrary.AsmHelper.GetMembersOf(System.Object)">
+            <summary>
+            Gets the information about the object members.
+            <p>This is an extremely light way of getting Reflection information of a given object. Object can be either local one
+            or a TransparentProxy of the object instantiated in a remote AppDomain.</p>
+            <remarks>Note: Because none of the MemberInfo derivatives is serializable. This makes it impossible to use Reflection
+            for discovering the type members instantiated in the different AppDomains. And the TransparentProxies do not provide any marshaled
+            Reflection API neither.
+            </remarks>
+            <example>
+            <code>
+            using (var helper = new AsmHelper(CSScript.CompileCode(code), null, true))
+            {
+                var script = helper.CreateObject("Script"); //script code has 'class Script' declared
+                foreach (string info in helper.GetMembersOf(script))
+                    Debug.WriteLine(info);
+            }
+            </code>
+            </example>
+            </summary>
+            <param name="obj">The object.</param>
+            <returns>Collection of strings with each item representing human readable information about the Type member.
+            <para>
+            <c>Type implementation:</c><code>
+            class Script
+            {
+                public void SayHello(string gritting)
+                {
+                    ...
+            </code>
+            </para>
+            <para>
+            <para><c>Type member information:</c> </para>
+            "MemberType:Method;Name:SayHello;DeclaringType:Script;Signature:Void SayHello(System.String)"
+            </para>
+            </returns>
         </member>
         <member name="M:CSScriptLibrary.AsmHelper.TryCreateObject(System.String)">
              <summary>
@@ -1343,7 +1588,7 @@
         </member>
         <member name="M:CSScriptLibrary.AsmHelper.Dispose">
             <summary>
-            Implementation of IDisposable.Dispose(). Disposes allocated exetrnal resources if any. Call this method to unload non-current AppDomain (if it was created).
+            Implementation of IDisposable.Dispose(). Disposes allocated external resources if any. Call this method to unload non-current AppDomain (if it was created).
             </summary>
         </member>
         <member name="M:CSScriptLibrary.AsmHelper.Dispose(System.Boolean)">
@@ -1705,6 +1950,16 @@
             	Script file path if the specified assembly is a script assembly otherwise <c>null</c>.
             </returns>
         </member>
+        <member name="M:CSScriptLibrary.CSScript.AggregateReferencedAssemblies(CSScriptLibrary.ScriptParser,System.String[],System.String)">
+            <summary>
+            Aggregates the referenced assemblies found by parser.
+            </summary>
+            <param name="parser">The parser.</param>
+            <param name="searchDirs">Extra search/probing directories.</param>
+            <param name="defaultRefAssemblies">The default reference assemblies. It is a semicolon separated assembly names string 
+            (e.g. "System.Core; System.Linq;").</param>
+            <returns></returns>
+        </member>
         <member name="F:CSScriptLibrary.CSScript.GlobalSettings">
             <summary>
             Settings object containing runtime settings, which controls script compilation/execution.
@@ -1855,6 +2110,47 @@
              <param name="methodCode">The C# code, containing method implementation.</param>
              <param name="refAssemblies">The string array containing file names to the additional assemblies referenced by the script. </param>
              <returns>Compiled assembly.</returns>
+        </member>
+        <member name="M:CSScriptLibrary.CSScript.LoadDelegate``1(System.String,System.String,System.Boolean,System.String[])">
+             <summary>
+             Wraps C# code fragment into auto-generated class (type name <c>Scripting.DynamicClass</c>), evaluates it and loads the class to the current AppDomain.
+             <para>Returns instance of <c>T</c> delegate for the first method in the auto-generated class.</para>
+             </summary>
+              <example>The following is the simple example of the interface alignment:
+             <code>
+             var Product = CSScript.LoadDelegate&lt;Func&lt;int, int, int&gt;&gt;(
+                                     @"int Product(int a, int b)
+                                       {
+                                           return a * b;
+                                       }");
+            
+             int result = Product(3, 2);
+             </code>
+             </example>
+             <param name="methodCode">The C# code.</param>
+             <param name="assemblyFile">The name of compiled assembly. If set to null a temporary file name will be used.</param>
+             <param name="debugBuild">'true' if debug information should be included in assembly; otherwise, 'false'.</param>
+             <param name="refAssemblies">The string array containing file names to the additional assemblies referenced by the script. </param>
+             <returns>Instance of <c>T</c> delegate.</returns>
+        </member>
+        <member name="M:CSScriptLibrary.CSScript.LoadDelegate``1(System.String)">
+             <summary>
+             Wraps C# code fragment into auto-generated class (type name <c>Scripting.DynamicClass</c>), evaluates it and loads the class to the current AppDomain.
+             <para>Returns instance of <c>T</c> delegate for the first method in the auto-generated class.</para>
+             </summary>
+              <example>The following is the simple example of the interface alignment:
+             <code>
+             var Product = CSScript.LoadDelegate&lt;Func&lt;int, int, int&gt;&gt;(
+                                     @"int Product(int a, int b)
+                                       {
+                                           return a * b;
+                                       }");
+            
+             int result = Product(3, 2);
+             </code>
+             </example>
+             <param name="methodCode">The C# code.</param>
+             <returns>Instance of <c>T</c> delegate.</returns>
         </member>
         <member name="M:CSScriptLibrary.CSScript.BuildEval(System.String)">
              <summary>
@@ -2083,9 +2379,18 @@
             Note the script cache is always maintained by the script engine. The CacheEnabled property only indicates if the cached script should be used or not when CSScript.Load(...) method is called.
             </summary>
         </member>
-        <member name="M:CSScriptLibrary.CSScript.GetCachedScriptAssembly(System.String)">
+        <member name="M:CSScriptLibrary.CSScript.GetCachedScriptAssemblyFile(System.String)">
             <summary>
-            Returns cached script assembly matching the script file name.
+            Returns file path of the cached script assembly matching the script file name.
+            </summary>
+            <param name="file">Script file path.</param>
+            <returns>Path to the previously compiled script assembly.
+            Returns null if the cached script cannot be found.
+            </returns>
+        </member>
+        <member name="M:CSScriptLibrary.CSScript.GetLoadedCachedScriptAssembly(System.String)">
+            <summary>
+            Returns loaded cached script assembly matching the script file name.
             </summary>
             <param name="file">Script file path.</param>
             <returns>Assembly loaded in the current AppDomain.
@@ -2156,6 +2461,28 @@
              The <c>Eval</c> namespaces.
              </value>
         </member>
+        <member name="P:CSScriptLibrary.CSScript.ResolveSourceAlgorithm">
+            <summary>
+            The resolve source file algorithm.
+            <para>
+            The default algorithm searches for script file by given script name. Search order:
+            1. Current directory
+            2. extraDirs (usually %CSSCRIPT_DIR%\Lib and ExtraLibDirectory)
+            3. PATH
+            Also fixes file name if user did not provide extension for script file (assuming .cs extension)
+            </para>
+            <para>If the default implementation isn't suitable then you can set <c>CSScript.ResolveSourceAlgorithm</c> 
+            to the alternative implementation of the probing algorithm.</para>
+            </summary>
+        </member>
+        <member name="P:CSScriptLibrary.CSScript.ResolveAssemblyAlgorithm">
+            <summary>
+            Resolves namespace/assembly(file) name into array of assembly locations (local and GAC ones).
+            </summary>
+            <para>If the default implementation isn't suitable then you can set <c>CSScript.ResolveAssemblyAlgorithm</c> 
+            to the alternative implementation of the probing algorithm.</para>
+            <returns>collection of assembly file names where namespace is implemented</returns>
+        </member>
         <member name="P:CSScriptLibrary.CSScript.ScriptCache">
             <summary>
             Cache of all loaded script files for the current process.
@@ -2178,7 +2505,7 @@
             <para>The default implementation is <see cref="T:CSScriptLibrary.CSScript.CachProbing.Simplified"/>.</para>
             <para>You can always supply your custom algorithm. For example <p>
             <c>CSScript.IsOutOfDate = (s, a) => true;</c></p>
-            fill force CS-Script to recompile the script every time it is loaded.</para>
+            will force CS-Script to recompile the script every time it is loaded.</para>
             </summary>
         </member>
         <member name="P:CSScriptLibrary.CSScript.Evaluator">
@@ -2357,6 +2684,7 @@
             </para>
             </summary>
             <param name="assembly">The path to the assembly file.</param>
+            <returns>The instance of the <see cref="T:CSScriptLibrary.Evluator"/>.</returns>
         </member>
         <member name="M:CSScriptLibrary.Evaluator.ReferenceAssembly(System.Reflection.Assembly)">
             <summary>
@@ -2367,6 +2695,16 @@
             </para>
             </summary>
             <param name="assembly">The assembly instance.</param>
+            <returns>The instance of the <see cref="T:CSScriptLibrary.Evluator"/>.</returns>
+        </member>
+        <member name="M:CSScriptLibrary.Evaluator.ReferenceAssemblyByName(System.String)">
+            <summary>
+            References the name of the assembly by its partial name.
+            <para>Note that the referenced assembly will be loaded into the host AppDomain in order to resolve assembly partial name.</para>
+            <para>It is an equivalent of <code>Evaluator.ReferenceAssembly(Assembly.LoadWithPartialName(assemblyPartialName))</code></para>
+            </summary>
+            <param name="assemblyPartialName">Partial name of the assembly.</param>
+            <returns>The instance of the <see cref="T:CSScriptLibrary.Evluator"/>.</returns>
         </member>
         <member name="M:CSScriptLibrary.Evaluator.ReferenceAssemblyOf(System.Object)">
             <summary>
@@ -2377,6 +2715,7 @@
             </para>
             </summary>
             <param name="obj">The object, which belongs to the assembly to be referenced.</param>
+            <returns>The instance of the <see cref="T:CSScriptLibrary.Evluator"/>.</returns>
         </member>
         <member name="M:CSScriptLibrary.Evaluator.ReferenceAssemblyByNamespace(System.String)">
             <summary>
@@ -2392,6 +2731,7 @@
             </summary>
             <param name="code">The script code.</param>
             <param name="searchDirs">The assembly search/probing directories.</param>
+            <returns>The instance of the <see cref="T:CSScriptLibrary.Evluator"/>.</returns>
         </member>
         <member name="M:CSScriptLibrary.Evaluator.ReferenceAssemblyOf``1">
             <summary>
@@ -2402,6 +2742,7 @@
             </para>
             </summary>
             <typeparam name="T">Te type which is implemented in the assembly to be referenced.</typeparam>
+            <returns>The instance of the <see cref="T:CSScriptLibrary.Evluator"/>.</returns>
         </member>
         <member name="M:CSScriptLibrary.Evaluator.LoadCode(System.String)">
              <summary>
@@ -2501,7 +2842,7 @@
         </member>
         <member name="M:CSScriptLibrary.Evaluator.LoadMethod(System.String)">
              <summary>
-             Wraps C# code fragment into auto-generated class (type name <c>DynamicClass</c>), evaluates it and loads (returns instance) the class to the current AppDomain.
+             Wraps C# code fragment into auto-generated class (type name <c>Scripting.DynamicClass</c>), evaluates it and loads (returns instance) the class to the current AppDomain.
              </summary>
              <example>The following is the simple example of the LoadMethod usage:
              <code>
@@ -2519,7 +2860,7 @@
         </member>
         <member name="M:CSScriptLibrary.Evaluator.LoadMethod``1(System.String)">
             <summary>
-            Wraps C# code fragment into auto-generated class (type name <c>DynamicClass</c>), evaluates it and loads (returns instance) the class to the current AppDomain.
+            Wraps C# code fragment into auto-generated class (type name <c>Scripting.DynamicClass</c>), evaluates it and loads (returns instance) the class to the current AppDomain.
             <para>
             After initializing the class instance it is aligned to the interface specified by the parameter <c>T</c>.
             </para>
@@ -2550,7 +2891,26 @@
         </member>
         <member name="M:CSScriptLibrary.Evaluator.CreateDelegate(System.String)">
              <summary>
-             Wraps C# code fragment into auto-generated class (type name <c>DynamicClass</c>), evaluates it and loads the class to the current AppDomain.
+             Wraps C# code fragment into auto-generated class (type name <c>Scripting.DynamicClass</c>), evaluates it and loads the class to the current AppDomain.
+             <para>Returns instance of <c>T</c> delegate for the first method in the auto-generated class.</para>
+             </summary>
+              <example>The following is the simple example of the interface alignment:
+             <code>
+             var Product = CSScript.Evaluator.LoadDelegate&lt;Func&lt;int, int, int&gt;&gt;(
+                                             @"int Product(int a, int b)
+                                               {
+                                                   return a * b;
+                                               }");
+            
+             int result = Product(3, 2);
+             </code>
+             </example>
+             <param name="code">The C# code.</param>
+             <returns>Instance of <c>T</c> delegate.</returns>
+        </member>
+        <member name="M:CSScriptLibrary.Evaluator.LoadDelegate``1(System.String)">
+             <summary>
+             Wraps C# code fragment into auto-generated class (type name <c>Scripting.DynamicClass</c>), evaluates it and loads the class to the current AppDomain.
              <para>Returns <see cref="T:CSScriptLibrary.MethodDelegate"/> for class-less style of invoking.</para>
              </summary>
               <example>The following is the simple example of the interface alignment:
@@ -2565,22 +2925,16 @@
              </code>
              </example>
              <param name="code">The C# code.</param>
-             <returns>Delegate of CSScriptLibrary.MethodDelegate type.</returns>
+             <returns></returns>
         </member>
         <member name="M:CSScriptLibrary.Evaluator.CompileMethod(System.String)">
             <summary>
-            Wraps C# code fragment into auto-generated class (type name <c>DynamicClass</c>), evaluates it.
+            Wraps C# code fragment into auto-generated class (type name <c>Scripting.DynamicClass</c>), evaluates it.
             <para>
             Returns instance of the <see cref="T:CSScriptLibrary.Evluator"/> for further access to the compilation result.</para>
             </summary>
             <param name="code">The C# code.</param>
             <returns>The instance of the <see cref="T:CSScriptLibrary.Evluator"/>.</returns>
-        </member>
-        <member name="M:CSScriptLibrary.Evaluator.GetCompiledAssembly">
-            <summary>
-            Gets the assembly compiled with the last Compile*/Load* call.
-            </summary>
-            <returns>Instance of the <see cref="T:System:Reflection.Assembly"/>.</returns>
         </member>
         <member name="M:CSScriptLibrary.Evaluator.GetCompiledType(System.String)">
             <summary>
@@ -2594,7 +2948,7 @@
             Evaluates (compiles) C# code.
             </summary>
             <param name="scriptText">The C# script text.</param>
-            <returns>The instance of the <see cref="T:CSScriptLibrary.Evluator"/>.</returns>
+            <returns>The compiled assembly.</returns>
         </member>
         <member name="M:CSScriptLibrary.Evaluator.Evaluate(System.String)">
             <summary>
@@ -2644,6 +2998,18 @@
             Gets or sets the flag indicating if the compilation error should throw an exception.
             </summary>
             <value>The throw on error.</value>
+        </member>
+        <member name="P:CSScriptLibrary.Evaluator.AutoResetEvaluatorOnError">
+            <summary>
+            Gets or sets a value indicating whether to reset <c>Mono.Evaluator</c> automatically after it fails
+            to compile the code.
+            <para>It is a work around for the <c>Mono.Evaluator</c> (v4.0.0.0), which cannot longer compile the valid C# code
+            after the first compilation failure.</para>
+            <para>This setting allows auto recreation (reset) of the actual <c>Mono.Evaluator</c> service.</para>
+            </summary>
+            <value>
+            <c>true</c> if <c>Mono.Evaluator</c> is to be reset automatically; otherwise, <c>false</c>.
+            </value>
         </member>
         <member name="P:CSScriptLibrary.Evaluator.WarningsAsErrors">
             <summary>
@@ -2701,11 +3067,12 @@
             Clears all errors and warnings.
             </summary>
         </member>
-        <member name="M:CSScriptLibrary.CompilingResult.Print(Mono.CSharp.AbstractMessage)">
+        <member name="M:CSScriptLibrary.CompilingResult.Print(Mono.CSharp.AbstractMessage,System.Boolean)">
             <summary>
             Handles compilation event message.
             </summary>
             <param name="msg">The compilation event message.</param>
+            <param name="showFullPath">if set to <c>true</c> [show full path].</param>
         </member>
         <member name="P:CSScriptLibrary.CompilingResult.HasErrors">
             <summary>
