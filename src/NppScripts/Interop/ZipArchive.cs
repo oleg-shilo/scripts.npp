@@ -16,7 +16,7 @@ namespace NppScripts
     {
         public static void Test()
         {
-            using (var zip = ZipArchive.OpenOnFile(@"E:\Galos\Projects\CS-Script.Npp\NppScripts\bin\Plugins\NppScripts\samples.zip"))
+            using (var zip = ZipArchive.OpenOnFile(@"E:\<>\Projects\CS-Script.Npp\NppScripts\bin\Plugins\NppScripts\samples.zip"))
             {
                 var arr = zip.Files.OrderBy(file => file.Name).Select(file => file.Name).ToArray();
                 foreach (var name in arr)
@@ -25,7 +25,7 @@ namespace NppScripts
                     if (data.FolderFlag) continue;
 
                     //var text = new StreamReader(data.GetStream().Wr).ReadToEnd();
-                    using (var fileStream = new FileStream(@"E:\Galos\Projects\CS-Script.Npp\NppScripts\bin\Plugins\NppScripts\www\" + name, FileMode.Create))
+                    using (var fileStream = new FileStream(@"E:\<>\Projects\CS-Script.Npp\NppScripts\bin\Plugins\NppScripts\www\" + name, FileMode.Create))
                     {
                         data.GetStream().CopyTo(fileStream);
                     }
