@@ -1,4 +1,7 @@
 echo off
+
+set programfiles=%PROGRAMFILES(X86)%
+
 md "%programfiles%\Notepad++\plugins\NppScripts"
 
 copy "bin\Debug\NppScripts.dll" "%programfiles%\Notepad++\plugins\NppScripts.dll"

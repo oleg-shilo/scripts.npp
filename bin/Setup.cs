@@ -1,4 +1,6 @@
-//css_ref %WIXSHARP_DIR%\WixSharp.dll;
+//css_dir %WIXSHARP_DIR%;
+//css_dir %WIXSHARP_DIR%\Wix_bin\bin;
+//css_ref Microsoft.Deployment.WindowsInstaller.dll;
 using IO = System.IO;
 using System;
 using WixSharp;

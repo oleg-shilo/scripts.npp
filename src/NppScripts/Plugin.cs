@@ -174,6 +174,7 @@ namespace NppScripts
 
         static NppScript EnsureScriptLoaded(ScriptInfo scriptInfo)
         {
+            var ttt = typeof(CSScriptLibraryExtensionMethods).Assembly.Location;
             if (File.GetLastWriteTime(scriptInfo.File) != scriptInfo.LastModified || scriptInfo.Script is NppScriptStub)
             {
                 scriptInfo.Script = LoadScript(scriptInfo.File, scriptInfo.Id);
