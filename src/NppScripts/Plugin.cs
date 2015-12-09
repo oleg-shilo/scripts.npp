@@ -174,7 +174,6 @@ namespace NppScripts
 
         static NppScript EnsureScriptLoaded(ScriptInfo scriptInfo)
         {
-            var ttt = typeof(CSScriptLibraryExtensionMethods).Assembly.Location;
             if (File.GetLastWriteTime(scriptInfo.File) != scriptInfo.LastModified || scriptInfo.Script is NppScriptStub)
             {
                 scriptInfo.Script = LoadScript(scriptInfo.File, scriptInfo.Id);
@@ -234,6 +233,31 @@ namespace NppScripts
 
         static bool initailShowScriptManager = false;
 
+        static Func<Assembly, string, object> createObject;
+
+        static object CreateObject(Assembly assembly, string name)
+        {
+            //return asm.CreateObject(name);  //may throw runtime method binding exception
+
+            //unfortunately there was some signature change in CS-Script for "CreateObject" so need to check what API is available at runtime.
+            //We cannot rely on the NppScript distributed version of CSScriptLibrary as it may be already loaded by CSScriptNpp plugin.
+            if (createObject == null)
+            {
+                var method = typeof(CSScriptLibraryExtensionMethods).GetMethod("CreateObject");
+                if (method.GetParameters().Length == 3)
+                {
+                    var createObjectNew = (Func<Assembly, string, object[], object>)Delegate.CreateDelegate(typeof(Func<Assembly, string, object[], object>), method);
+                    createObject = (asm, nm) => createObjectNew(asm, nm, null);
+                }
+                else
+                {
+                    createObject = (Func<Assembly, string, object>)System.Delegate.CreateDelegate(typeof(Func<Assembly, string, object>), method);
+                }
+            }
+
+            return createObject(assembly, name);
+        }
+
         static NppScript LoadScript(string file, int id)
         {
             try
@@ -252,7 +276,7 @@ namespace NppScripts
                 else
                     asm = Assembly.Load(File.ReadAllBytes(asmFile));
 
-                object script = asm.CreateObject("Script");
+                object script = CreateObject(asm, "Script");
 
                 var retval = (NppScript)script;
                 retval.ScriptFile = file;
@@ -276,11 +300,12 @@ namespace NppScripts
             }
 
             return new NppScriptStub
-                {
-                    ScriptFile = file,
-                    ScriptId = id
-                };
+            {
+                ScriptFile = file,
+                ScriptId = id
+            };
         }
+
 
         static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {

@@ -17,7 +17,6 @@ namespace NppScripts
     {
         public static void Init()
         {
-            //Debug.Assert(false);
             NppScripts.Plugin.CommandMenuInit(); //this will also call CSScriptIntellisense.Plugin.CommandMenuInit
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }

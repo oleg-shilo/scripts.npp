@@ -18,7 +18,7 @@ void main(string[] args)
         if (File.Exists(distro)) File.Delete(distro);
         File.Move(zipFile, distro);
         //MessageBox.Show(distro);
-        File.Copy(distro, @"E:\cs-script\cs-scriptWEB\npp\" + Path.GetFileName(distro), true);
+        File.Copy(distro, @"E:\cs-script.web\csscript\npp\" + Path.GetFileName(distro), true);
     }
 
     var sevenZFile = Directory.GetFiles(".", name +".7z").FirstOrDefault();
