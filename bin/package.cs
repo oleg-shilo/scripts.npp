@@ -30,9 +30,10 @@ void main(string[] args)
         File.Move(sevenZFile, distro);
     }
 
-    File.WriteAllText(@"E:\cs-script\cs-scriptWEB\npp\latest_npps_version.txt", version);
+    File.WriteAllText(@"E:\cs-script.web\csscript\npp\latest_npps_version.txt", version);
+    File.WriteAllText("latest_npps_version.txt", version);
 
-    var html = File.ReadAllText(@"E:\cs-script\cs-scriptWEB\npp\csscript.html");
-    html = html.Replace("https://dl.dropboxusercontent.com/u/2192462/CS-S_NPP/NppScripts.zip", "https://dl.dropboxusercontent.com/u/2192462/CS-S_NPP/NppScripts."+version+".zip");
-    File.WriteAllText(@"E:\cs-script\cs-scriptWEB\npp\csscript.html", html);
+    // var html = File.ReadAllText(@"E:\cs-script\cs-scriptWEB\npp\csscript.html");
+    // html = html.Replace("https://dl.dropboxusercontent.com/u/2192462/CS-S_NPP/NppScripts.zip", "https://dl.dropboxusercontent.com/u/2192462/CS-S_NPP/NppScripts."+version+".zip");
+    // File.WriteAllText(@"E:\cs-script\cs-scriptWEB\npp\csscript.html", html);
 }
