@@ -223,7 +223,7 @@ public class Script : NppScript
                         EditScript(SelectedScript.File);
                         Win32.SendMessage(Npp.NppHandle, NppMsg.NPPM_SAVECURRENTFILE, 0, 0);
 
-                        CSScript.Compile(SelectedScript.File, null, false, typeof(NppScript).Assembly.Location);
+                        CSScript.CompileFile(SelectedScript.File, null, false, typeof(NppScript).Assembly.Location);
 
                         MessageBox.Show("Success", "Notepad++ Automation");
                     }

@@ -121,25 +121,28 @@
             <param name="isFile">If set to 'true' the script is a file, otherwise it is a C# code.</param>
             <param name="directivesToSearch">Additional C# script directives to search. The search result is stored in CSharpParser.CustomDirectives.</param>
         </member>
+        <member name="M:csscript.CSharpParser.#ctor(System.String,System.Boolean,System.String[],System.String[])">
+            <summary>
+            Creates an instance of CSharpParser.
+            </summary>
+            <param name="script">C# script (code or file).</param>
+            <param name="isFile">If set to 'true' the script is a file, otherwise it is a C# code.</param>
+            <param name="directivesToSearch">Additional C# script directives to search. The search result is stored in CSharpParser.CustomDirectives.</param>
+            <param name="probingDirs">Search directories for resolving wild card paths in //css_inc and //css_imp</param>
+        </member>
         <member name="F:csscript.CSharpParser.CustomDirectives">
             <summary>
             The result of search for additional C# script directives to search (directive vs. value).
             </summary>
         </member>
-        <member name="M:csscript.CSharpParser.Init(System.String,System.String)">
-            <summary>
-            Parses the C# code. Only one of the 'code' and 'file' parameters can be non empty.
-            </summary>
-            <param name="code">C# script code (empty string if code is in a file form).</param>
-            <param name="file">The script file name (empty if code is in the text form).</param>
-        </member>
-        <member name="M:csscript.CSharpParser.Init(System.String,System.String,System.String[])">
+        <member name="M:csscript.CSharpParser.Init(System.String,System.String,System.String[],System.String[])">
             <summary>
             Parses the C# code.
             </summary>
             <param name="code">C# script (code or file).</param>
             <param name="file">If set to 'true' the script is a file, otherwise it is a C# code.</param>
             <param name="directivesToSearch">Additional C# script directives to search. The search result is stored in CSharpParser.CustomDirectives.</param>
+            <param name="probingDirs">Search directories for resolving wild card paths in //css_inc and //css_imp</param>
         </member>
         <member name="M:csscript.CSharpParser.DoRenaming(System.String[][],System.Boolean)">
             <summary>
@@ -364,6 +367,17 @@
         <member name="T:csscript.ResolveSourceFileHandler">
             <summary>
             Delegate implementing source file probing algorithm.
+            <para>The method is deprecated because it only allows returning a single file. While in reality it can be many. 
+            For example the file and its auto-generated derivatives (e.g. *.g.cs). </para>
+            </summary>
+            <param name="file">The file.</param>
+            <param name="searchDirs">The extra dirs.</param>
+            <param name="throwOnError">if set to <c>true</c> [throw on error].</param>
+            <returns></returns>
+        </member>
+        <member name="T:csscript.ResolveSourceFileAlgorithm">
+            <summary>
+            Delegate implementing source file probing algorithm.
             </summary>
             <param name="file">The file.</param>
             <param name="searchDirs">The extra dirs.</param>
@@ -502,6 +516,12 @@
             Show sample precompiler C# script file.
             </summary>
         </member>
+        <member name="M:csscript.CSExecutor.DoCacheOperations(System.String)">
+            <summary>
+            Performs the cache operations and shows the operation output.
+            </summary>
+            <param name="command">The command.</param>
+        </member>
         <member name="M:csscript.CSExecutor.CreateDefaultConfigFile">
             <summary>
             Creates the default config file in the CurrentDirectory.
@@ -553,6 +573,40 @@
             <param name="hideCompilerWarnings">if set to <c>true</c> hide compiler warnings.</param>
             <returns></returns>
         </member>
+        <member name="P:csscript.CompilerException.ErrorCount">
+            <summary>
+            Gets or sets the error count associated with the last script compilation.
+            </summary>
+            <value>The error count.</value>
+        </member>
+        <member name="T:csscript.ConcurrencyControl">
+            <summary>
+            Indicates synchronization model used to for controlling concurrency when the same script file is executed by multiple processes. 
+            </summary>
+        </member>
+        <member name="F:csscript.ConcurrencyControl.Standard">
+            <summary>
+            Simple model. The script engine doesn't start the timestamp validation and the script compilation until another engine 
+            validating finishes its job. 
+            <para>
+            Note: the compilation may be skipped if caching is enabled and the validation reviles that the previous compilation (cache) 
+            is still up to date. </para> 
+            <para>    
+            Due to the limited choices with the system wide named synchronization objects on Linux <c>Standard</c> is the only available 
+            synchronization model on Linux. And it is just happens to be a good default choice for Windows as well.</para>        
+            </summary>
+        </member>
+        <member name="F:csscript.ConcurrencyControl.HighResolution">
+            <summary>
+            A legacy synchronization model available on Windows only. While it can be beneficial in the intense concurrent "border line" scenarios,
+            its practical value very limited. 
+            </summary>
+        </member>
+        <member name="F:csscript.ConcurrencyControl.None">
+            <summary>
+            No concurrency control is done by the script engine. All synchronization is the responsibility of the hosting environment.
+            </summary>
+        </member>
         <member name="T:csscript.ExecuteOptions">
             <summary>
             Application specific runtime settings
@@ -591,7 +645,7 @@
             with throwOnError flag set to true.
             </summary>
         </member>
-        <member name="F:CSScriptLibrary.FileParser.ResolveFileAlgorithm">
+        <member name="F:CSScriptLibrary.FileParser.ResolveFilesAlgorithm">
             <summary>
             The resolve file algorithm,
             <para>
@@ -610,7 +664,7 @@
             2. extraDirs (usually %CSSCRIPT_DIR%\Lib and ExtraLibDirectory)
             3. PATH
             Also fixes file name if user did not provide extension for script file (assuming .cs extension)
-            <para>If the default implementation isn't suitable then you can set <c>FileParser.ResolveFileAlgorithm</c> 
+            <para>If the default implementation isn't suitable then you can set <c>FileParser.ResolveFilesAlgorithm</c> 
             to the alternative implementation of the probing algorithm.</para>
             </summary>
         </member>
@@ -971,6 +1025,15 @@
             regardless if the user specified "/dbg" when a particular script is launched.
             </summary>
         </member>
+        <member name="P:csscript.Settings.InjectScriptAssemblyAttribute">
+            <summary>
+            Gets or sets a value indicating whether script assembly attribute should be injected. The AssemblyDecription attribute 
+            contains the original location of the script file the assembly being compiled from./
+            </summary>
+            <value>
+            <c>true</c> if the attribute should be injected; otherwise, <c>false</c>.
+            </value>
+        </member>
         <member name="P:csscript.Settings.OpenEndDirectiveSyntax">
             <summary>
             Enables omitting closing character (";") for CS-Script directives (e.g. "//css_ref System.Xml.dll" instead of "//css_ref System.Xml.dll;").
@@ -1071,6 +1134,12 @@
             false - script assembly will be loaded as a file. It is an equivalent of Assembly.LoadFrom(string assemblyFile).
             true - script assembly will be loaded as a file. It is an equivalent of Assembly.Load(byte[] rawAssembly)
             </summary>
+        </member>
+        <member name="P:csscript.Settings.ConcurrencyControl">
+            <summary>
+            Gets or sets the concurrency control model.
+            </summary>
+            <value>The concurrency control.</value>
         </member>
         <member name="T:csscript.Settings.HideOptions">
             <summary>
@@ -2359,6 +2428,9 @@
             Compiles script code from the specified file into assembly with CSExecutor and loads it in current AppDomain.
             <para>This method is a logical equivalent of the corresponding <c>LoadCode</c> method except the code is
             not specified as a call argument but read from the file instead.</para>
+            <para>It is recommended to use LoadFrom method instead as it is more straight forward and arguably faster.
+            Use LoadCodeFrom only if you indeed want to disassociate your script code from the script file or 
+            if the original location of the source file some how is incompatible with the actual C# compiler.</para>
             </summary>
             <param name="scriptFile">The script file.</param>
             <param name="refAssemblies">The string array containing file names to the additional assemblies referenced by the script. </param>
@@ -2391,6 +2463,9 @@
             Compiles script code from the specified file into assembly with CSExecutor and loads it in current AppDomain.
             <para>This method is a logical equivalent of the corresponding <c>LoadCode</c> method except the code is
             not specified as a call argument but read from the file instead.</para>
+            <para>It is recommended to use LoadFrom method instead as it is more straight forward and arguably faster.
+            Use LoadCodeFrom only if you indeed want to disassociate your script code from the script file or 
+            if the original location of the source file some how is incompatible with the actual C# compiler.</para>
             </summary>
             <param name="scriptFile">The script file.</param>
             <param name="assemblyFile">The name of compiled assembly. If set to null a temporary file name will be used.</param>
@@ -2404,6 +2479,9 @@
             </summary>
             <para>This method is a logical equivalent of the corresponding <c>LoadCode</c> method except the code is
             not specified as a call argument but read from the file instead.</para>
+            <para>It is recommended to use LoadFrom method instead as it is more straight forward and arguably faster.
+            Use LoadCodeFrom only if you indeed want to disassociate your script code from the script file or 
+            if the original location of the source file some how is incompatible with the actual C# compiler.</para>
             <param name="scriptFile">The script file.</param>
             <param name="tempFileExtension">The file extension of the temporary file to hold script code during compilation. This parameter may be
             needed if custom CS-Script compilers rely on file extension to identify the script syntax.</param>
@@ -2542,9 +2620,15 @@
              <para>Generic <see cref="T:CSScriptLibrary.IEvaluator"/> interface provides a convenient way of accessing 
              compilers without 'committing' to a specific compiler technology (e.g. Mono, Roslyn, CodeDOM). This may be 
              required during troubleshooting or performance tuning.</para>
-             <para>Switching between compilers can be done via global CSScript.<see cref="P:CSScriptLibrary.CSScript.EvaluatorConfig.Engine"/>.</para>
+             <para>Switching between compilers can be done via global 
+             CSScript.<see cref="P:CSScriptLibrary.CSScript.EvaluatorConfig.Engine"/>.</para>
+             <remarks>
+             By default CSScript.<see cref="P:CSScriptLibrary.CSScript.Evaluator"/> always returns a new instance of 
+             <see cref="T:CSScriptLibrary.IEvaluator"/>. If this behavior is undesired change the evaluator access 
+             policy by setting <see cref="P:CSScriptLibrary.CSScript.EvaluatorConfig"/>.Access value.
+             </remarks>
              </summary>
-             <value>The <see cref="T:CSScriptLibrary.MonoEvaluator"/> instance.</value>
+             <value>The <see cref="T:CSScriptLibrary.IEvaluator"/> instance.</value>
              <example>
             <code>
              if(testingWithMono)
@@ -3137,6 +3221,13 @@
             </summary>
             <value><c>true</c> if 'debug build'; otherwise, <c>false</c>.</value>
         </member>
+        <member name="P:CSScriptLibrary.IEvaluator.DisableReferencingFromCode">
+            <summary>
+            Gets or sets the flag indicating if the script code should be analyzed and the assemblies 
+            that the script depend on (via '//css_...' and 'using ...' directives) should be referenced.
+            </summary>
+            <value></value>
+        </member>
         <member name="M:CSScriptLibrary.CodeDomEvaluator.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:CSScriptLibrary.CodeDomEvaluator"/> class.
@@ -3530,6 +3621,13 @@
             <para>Note, currently only CodeDom fully supports generation of debugging symbols.</para>
             </summary>
             <value><c>true</c> if 'debug build'; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:CSScriptLibrary.CodeDomEvaluator.DisableReferencingFromCode">
+            <summary>
+            Gets or sets the flag indicating if the script code should be analyzed and the assemblies 
+            that the script depend on (via '//css_...' and 'using ...' directives) should be referenced.
+            </summary>
+            <value></value>
         </member>
         <member name="T:CSScriptLibrary.BuildConfiguration">
             <summary>
@@ -4015,6 +4113,13 @@
             </summary>
             <value>The throw on error.</value>
         </member>
+        <member name="P:CSScriptLibrary.MonoEvaluator.DisableReferencingFromCode">
+            <summary>
+            Gets or sets the flag indicating if the script code should be analyzed and the assemblies 
+            that the script depend on (via '//css_...' and 'using ...' directives) should be referenced.
+            </summary>
+            <value></value>
+        </member>
         <member name="P:CSScriptLibrary.MonoEvaluator.AutoResetEvaluatorOnError">
             <summary>
             Gets or sets a value indicating whether to reset <c>Mono.Evaluator</c> automatically after it fails
@@ -4432,6 +4537,12 @@
             Default value of the <see cref="T:CSScriptLibrary.IEvaluator"/>.DebugBuild property controlling the generation of the debug symbols.
             </summary>
         </member>
+        <member name="P:CSScriptLibrary.EvaluatorConfig.RefernceDomainAsemblies">
+            <summary>
+            Flag that controls if the host AppDo,main referenced assemblies are automatically referenced at creation 
+            of <see cref="T:CSScriptLibrary.IEvaluator"/>.
+            </summary>
+        </member>
         <member name="P:CSScriptLibrary.EvaluatorConfig.Engine">
             <summary>
             Gets or sets the default evaluator engine type.
@@ -4621,6 +4732,13 @@
             <param name="assembly">The assembly.</param>
             <returns>Assembly strong name.</returns>
         </member>
+        <member name="M:CSScriptLibrary.AppDomainHelper.GetOriginalLocation(System.Reflection.Assembly)">
+            <summary>
+            Gets the original location of the script that the assemble been compiled from.
+            </summary>
+            <param name="assembly">The assembly.</param>
+            <returns></returns>
+        </member>
         <member name="M:CSScriptLibrary.AppDomainHelper.Clone(System.AppDomain,System.String,System.Security.PermissionSet,System.Security.Policy.StrongName[])">
             <summary>
             Clones the specified <see cref="T:System.AppDomain"/>. The mandatory "creation" properties of the <paramref name="domain"/> are used to create the new instance of <see cref="T:System.AppDomain"/>.
@@ -4647,6 +4765,13 @@
             </example>
             </para>
             </summary>
+        </member>
+        <member name="M:CSScriptLibrary.Sandbox.With``1(``0,System.Action{``0})">
+            <summary>
+            Extension method. To assist with Fluent API.
+            </summary>
+            <param name="obj">The object that is a subject of Fluent invocation.</param>
+            <param name="action">The action to be performed against object.</param>
         </member>
         <member name="M:CSScriptLibrary.Sandbox.Execute(System.Security.PermissionSet,CSScriptLibrary.Sandbox.Action)">
             <summary>

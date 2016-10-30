@@ -267,7 +267,7 @@ namespace NppScripts
                 CSScript.CacheEnabled = true;
                 bool debugScript = true;
 
-                string asmFile = CSScript.Compile(file, null, debugScript, Assembly.GetExecutingAssembly().Location);
+                string asmFile = CSScript.CompileFile(file, null, debugScript, Assembly.GetExecutingAssembly().Location);
                 string debugSymbols = Path.ChangeExtension(asmFile, ".pdb");
 
                 Assembly asm;
