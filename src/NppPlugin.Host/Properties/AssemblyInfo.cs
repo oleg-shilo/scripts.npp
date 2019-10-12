@@ -5,14 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Notepad++ Automation")]
-[assembly: AssemblyDescription("Notepad++ plugin for C# based automation. \r\n" +
-                               "The plugin allows implementing a simple macros-like automations as well as the full scale script based plugins " +
-                               "by means of C# scripts.\r\nThe solution is based on CS-Script C# script engine.")]
+[assembly: AssemblyTitle("NppPlugin.Host")]
+[assembly: AssemblyDescription("Generic portable Notepad++ plugin host. Based on kbilsted/NotepadPlusPlusPluginPack.Net")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("CS-Script")]
-[assembly: AssemblyProduct("Notepad++ Automation")]
-[assembly: AssemblyCopyright("Copyright © Oleg Shilo 2015-2016")]
+[assembly: AssemblyCompany("Oleg Shilo")]
+[assembly: AssemblyProduct("NppPlugin.Host")]
+[assembly: AssemblyCopyright("Copyright © Oleg Shilo 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -22,4 +20,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2f8c343a-3fa0-47ba-b3b5-23a5757f8199")]
+[assembly: Guid("31492674-6fe0-485c-91f0-2e17244588ff")]

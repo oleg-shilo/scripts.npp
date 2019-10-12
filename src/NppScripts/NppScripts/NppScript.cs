@@ -91,7 +91,6 @@ namespace NppScripts
         /// </summary>
         public Action<SCNotification> OnNotification;
 
-
         /// <summary>
         /// The default handler for on <see cref="T:NppScripts.SCNotification"/>.
         /// </summary>

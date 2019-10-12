@@ -17,9 +17,9 @@ using CSScriptLibrary;
  TODO:
  * XML Documentation for Npp.Members
  */
+
 namespace NppScripts
 {
-
     public partial class Plugin
     {
         static internal void CommandMenuInit()
@@ -32,8 +32,8 @@ namespace NppScripts
         static public NppScript GetScriptByTag(object tag)
         {
             var info = Plugin.AllConfiguredScripts
-                         .Where(s => tag.Equals(s.Tag))
-                         .FirstOrDefault();
+                           .Where(s => tag.Equals(s.Tag))
+                           .FirstOrDefault();
 
             if (info == null)
                 return null;
@@ -44,8 +44,8 @@ namespace NppScripts
         static public NppScript GetScriptByFileName(string file)
         {
             var info = Plugin.AllConfiguredScripts
-                        .Where(s => string.Compare(Path.GetFullPath(s.File), Path.GetFullPath(file), StringComparison.OrdinalIgnoreCase) == 0)
-                        .FirstOrDefault();
+                       .Where(s => string.Compare(Path.GetFullPath(s.File), Path.GetFullPath(file), StringComparison.OrdinalIgnoreCase) == 0)
+                       .FirstOrDefault();
 
             if (info == null)
                 return null;
@@ -305,7 +305,6 @@ namespace NppScripts
                 ScriptId = id
             };
         }
-
 
         static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {

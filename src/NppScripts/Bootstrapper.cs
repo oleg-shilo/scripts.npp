@@ -1,4 +1,3 @@
-using CSScriptLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,10 +8,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using CSScriptLibrary;
 
 namespace NppScripts
 {
-
     class Bootstrapper
     {
         public static void Init()
@@ -34,6 +33,10 @@ namespace NppScripts
                     asm = Path.Combine(rootDir, @"NppScripts\CSScriptLibrary.dll");
                     if (File.Exists(asm))
                         return Assembly.LoadFrom(asm);
+                }
+                else if (args.Name.StartsWith("NppScripts.Host,"))
+                {
+                    return typeof(Win32).Assembly;
                 }
                 else if (args.Name == Assembly.GetExecutingAssembly().FullName)
                     return Assembly.GetExecutingAssembly();

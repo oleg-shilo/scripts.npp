@@ -2123,6 +2123,36 @@ namespace NppScripts
             return Win32.SendMessage(hWnd, (int)WinMsg.WM_COMMAND, (int)wParam, lParam);
         }
 
+        public static IntPtr SendMessage(IntPtr hWnd, NppMsg Msg, int wParam, out string lParam)
+        {
+            var text = new StringBuilder(Win32.MAX_PATH);
+            IntPtr retval = Win32.SendMessage(hWnd, Msg, 0, text);
+            lParam = text.ToString();
+            return retval;
+        }
+
+        public static IntPtr SendMessage(IntPtr hWnd, SciMsg Msg, int wParam, out string lParam)
+        {
+            var text = new StringBuilder(Win32.MAX_PATH);
+            IntPtr retval = Win32.SendMessage(hWnd, Msg, 0, text);
+            lParam = text.ToString();
+            return retval;
+        }
+
+        public static IntPtr SendMessage(IntPtr hWnd, NppMsg Msg, int wParam, out List<string> lParam)
+        {
+            lParam = new List<string>();
+
+            using (var cStrArray = new ClikeStringArray(wParam, Win32.MAX_PATH))
+            {
+                if (Win32.SendMessage(hWnd, Msg, cStrArray.NativePointer, wParam) != IntPtr.Zero)
+                    foreach (string item in cStrArray.ManagedStringsUnicode)
+                        lParam.Add(item);
+            }
+
+            return IntPtr.Zero;
+        }
+
         [DllImport("user32")]
         public static extern IntPtr SendMessage(IntPtr hWnd, NppMsg Msg, int wParam, NppMenuCmd lParam);
 
@@ -2153,29 +2183,6 @@ namespace NppScripts
         [DllImport("user32")]
         public static extern IntPtr SendMessage(IntPtr hWnd, NppMsg Msg, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder lParam);
 
-        public static IntPtr SendMessage(IntPtr hWnd, NppMsg Msg, int wParam, out string lParam)
-        {
-            var text = new StringBuilder(Win32.MAX_PATH);
-            IntPtr retval = Win32.SendMessage(hWnd, Msg, 0, text);
-            lParam = text.ToString();
-            return retval;
-        }
-
-        public static IntPtr SendMessage(IntPtr hWnd, NppMsg Msg, int wParam, out List<string> lParam)
-        {
-            lParam = new List<string>();
-
-            using (var cStrArray = new ClikeStringArray(wParam, Win32.MAX_PATH))
-            {
-                if (Win32.SendMessage(hWnd, Msg, cStrArray.NativePointer, wParam) != IntPtr.Zero)
-                    foreach (string item in cStrArray.ManagedStringsUnicode)
-                        lParam.Add(item);
-            }
-
-            return IntPtr.Zero;
-        }
-
-
         [DllImport("user32")]
         public static extern IntPtr SendMessage(IntPtr hWnd, SciMsg Msg, int wParam, IntPtr lParam);
 
@@ -2187,15 +2194,6 @@ namespace NppScripts
 
         [DllImport("user32")]
         public static extern IntPtr SendMessage(IntPtr hWnd, SciMsg Msg, int wParam, int lParam);
-
-
-        public static IntPtr SendMessage(IntPtr hWnd, SciMsg Msg, int wParam, out string lParam)
-        {
-            var text = new StringBuilder(Win32.MAX_PATH);
-            IntPtr retval = Win32.SendMessage(hWnd, Msg, 0, text);
-            lParam = text.ToString();
-            return retval;
-        }
 
         [DllImport("Shell32.dll")]
         public extern static int ExtractIconEx(string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
