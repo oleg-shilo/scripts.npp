@@ -223,6 +223,12 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
             return SendMessage(hWnd, (UInt32)Msg, new IntPtr(wParam), lParam);
         }
 
+        [DllImport("user32")]
+        public static extern IntPtr SendMessage(IntPtr hWnd, NppMsg Msg, int wParam, ref LangType lParam);
+
+        [DllImport("user32")]
+        public static extern IntPtr SendMessage(IntPtr hWnd, NppMsg Msg, int wParam, int lParam);
+
         /// <summary>
         /// You should try to avoid calling this method in your plugin code. Rather use one of the gateways such as
         /// <see cref="ScintillaGateway"/> or <see cref="NotepadPPGateway"/>.
