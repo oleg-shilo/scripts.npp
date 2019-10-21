@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{23B08B10-8297-4A90-9B6D-43DAC7416004}</ProjectGuid>
+    <ProjectGuid>{DC4877AA-FC2F-4407-A0AA-5460A7832CEB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NppScripts</RootNamespace>
-    <AssemblyName>NppScripts</AssemblyName>
+    <AssemblyName>NppScripts.asm</AssemblyName>
     <StartupObject>
     </StartupObject>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -27,11 +27,11 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
-    <DocumentationFile>bin\Debug\NppScripts.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\NppScripts.asm.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -42,10 +42,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <FileAlignment>512</FileAlignment>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Release\NppScripts.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\NppScripts.asm.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -66,8 +66,8 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="Interop\DllExport\NppPlugin.DllExport.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- <Import Project="Interop\DllExport\NppPlugin.DllExport.targets" /> -->
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
@@ -82,18 +82,22 @@
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Interop\CSScriptIntegration.cs" />
+    <Compile Include="Interop\Any\UnmanagedExports.cs" />
+    <Compile Include="Interop\CSScriptIntegration.Any.cs" />
     <Compile Include="Interop\LocalWindowsHook.cs" />
-    <Compile Include="Interop\WinHook.cs" />
+    <Compile Include="Interop\Npp.Any.cs" />
+    <Compile Include="Interop\WinHook.Any.cs" />
     <Compile Include="Interop\ZipArchive.cs" />
     <Compile Include="NppScripts\CSSctiptHelper.cs" />
-    <Compile Include="Interop\Npp.cs" />
+    <Compile Include="NppScripts\NppScript.Any.cs" />
+    <Compile Include="Plugin.Any.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="NppScripts\ReflectionExtensions.cs" />
+    <Compile Include="Properties\versionInfo.cs" />
     <Compile Include="Resources\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -105,19 +109,13 @@
     <Compile Include="ScriptNameInput.Designer.cs">
       <DependentUpon>ScriptNameInput.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interop\DllExport\DllExportAttribute.cs" />
-    <Compile Include="Interop\NppPluginNETBase.cs" />
-    <Compile Include="Interop\NppPluginNETHelper.cs" />
-    <Compile Include="Interop\UnmanagedExports.cs" />
     <Compile Include="Interop\Utils.cs" />
-    <Compile Include="ScriptManager.cs">
+    <Compile Include="ScriptManager.Any.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ScriptManager.Designer.cs">
-      <DependentUpon>ScriptManager.cs</DependentUpon>
+      <DependentUpon>ScriptManager.Any.cs</DependentUpon>
     </Compile>
-    <Compile Include="NppScripts\NppScript.cs" />
-    <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -152,15 +150,6 @@
     <EmbeddedResource Include="ScriptNameInput.resx">
       <DependentUpon>ScriptNameInput.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Interop\DllExport\Mono.Cecil.dll" />
-    <None Include="Interop\DllExport\NppPlugin.DllExport.dll" />
-    <None Include="Interop\DllExport\NppPlugin.DllExport.MSBuild.dll" />
-    <None Include="Interop\DllExport\README.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Interop\DllExport\NppPlugin.DllExport.targets" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\about.png" />
@@ -219,9 +208,18 @@
     </Content>
     <Content Include="NppScripts\CSScriptLibrary.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NppPlugin.Host\NppPlugin.Host.csproj">
+      <Project>{ffd87b89-de2e-4bd9-ab06-f1f58af8c252}</Project>
+      <Name>NppPlugin.Host</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy NppScripts.dll "C:\Program Files\Notepad++\plugins\NppScripts\NppScripts.dll"
+copy NppScripts.xml "C:\Program Files\Notepad++\plugins\NppScripts\NppScripts.xml"
+copy $(TargetName).dll "C:\Program Files\Notepad++\plugins\NppScripts\NppScripts\NppScripts.asm.dll"
+copy CSScriptLibrary.dll "C:\Program Files\Notepad++\plugins\NppScripts\NppScripts\CSScriptLibrary.dll"
+copy CSScriptLibrary.xml "C:\Program Files\Notepad++\plugins\NppScripts\NppScripts\CSScriptLibrary.xml"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

@@ -9,6 +9,16 @@ namespace NppScripts
 namespace Kbg.NppPluginNET.PluginInfrastructure
 #endif
 {
+    public static partial class Extensions
+    {
+        static byte[] emptyStringBytes = new byte[] { 0 };
+
+        public static byte[] ToBytes(this string text)
+            => string.IsNullOrEmpty(text) ?
+                emptyStringBytes :
+                Encoding.UTF8.GetBytes(text);
+    }
+
     /// <summary>
     /// This it the plugin-writers primary interface to Notepad++/Scintilla.
     /// It takes away all the complexity with command numbers and Int-pointer casting.
@@ -74,7 +84,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Add text to the document at current position. (Scintilla feature 2001)</summary>
         public unsafe void AddText(string text)
         {
-            var array = Encoding.UTF8.GetBytes(text);
+            var array = text.ToBytes();
             fixed (byte* textPtr = array)
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_ADDTEXT, array.Length, (IntPtr)textPtr);
@@ -86,7 +96,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Add text to the document at current position. (Scintilla feature 2001)</summary>
         public unsafe void AddText(int length, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_ADDTEXT, length, (IntPtr)textPtr);
             }
@@ -104,7 +114,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Insert string at a position. (Scintilla feature 2003)</summary>
         public unsafe void InsertText(Position pos, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_INSERTTEXT, pos.Value, (IntPtr)textPtr);
             }
@@ -113,7 +123,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Change the text that is being inserted in response to SC_MOD_INSERTCHECK (Scintilla feature 2672)</summary>
         public unsafe void ChangeInsertion(int length, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_CHANGEINSERTION, length, (IntPtr)textPtr);
             }
@@ -1184,7 +1194,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Select the item in the auto-completion list that starts with a string. (Scintilla feature 2108)</summary>
         public unsafe void AutoCSelect(string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_AUTOCSELECT, Unused, (IntPtr)textPtr);
             }
@@ -1717,7 +1727,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Replace the selected text with the argument text. (Scintilla feature 2170)</summary>
         public unsafe void ReplaceSel(string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_REPLACESEL, Unused, (IntPtr)textPtr);
             }
@@ -1788,7 +1798,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Replace the contents of the document with the argument text. (Scintilla feature 2181)</summary>
         public unsafe void SetText(string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_SETTEXT, Unused, (IntPtr)textPtr);
             }
@@ -1918,7 +1928,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// </summary>
         public unsafe int ReplaceTarget(int length, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_REPLACETARGET, length, (IntPtr)textPtr);
                 return (int)res;
@@ -1936,7 +1946,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// </summary>
         public unsafe int ReplaceTargetRE(int length, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_REPLACETARGETRE, length, (IntPtr)textPtr);
                 return (int)res;
@@ -1951,7 +1961,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// </summary>
         public unsafe int SearchInTarget(int length, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_SEARCHINTARGET, length, (IntPtr)textPtr);
                 return (int)res;
@@ -2364,7 +2374,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// </summary>
         public unsafe int TextWidth(int style, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_TEXTWIDTH, style, (IntPtr)textPtr);
                 return (int)res;
@@ -2416,7 +2426,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Append a string to the end of the document without changing the selection. (Scintilla feature 2282)</summary>
         public unsafe void AppendText(int length, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_APPENDTEXT, length, (IntPtr)textPtr);
             }
@@ -3084,7 +3094,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// </summary>
         public unsafe int SearchNext(int flags, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_SEARCHNEXT, flags, (IntPtr)textPtr);
                 return (int)res;
@@ -3098,7 +3108,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// </summary>
         public unsafe int SearchPrev(int flags, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_SEARCHPREV, flags, (IntPtr)textPtr);
                 return (int)res;
@@ -3475,7 +3485,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Copy argument text to the clipboard. (Scintilla feature 2420)</summary>
         public unsafe void CopyText(int length, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_COPYTEXT, length, (IntPtr)textPtr);
             }
@@ -4039,7 +4049,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Set the text in the text margin for a line (Scintilla feature 2530)</summary>
         public unsafe void MarginSetText(int line, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_MARGINSETTEXT, line, (IntPtr)textPtr);
             }
@@ -4124,7 +4134,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>Set the annotation text for a line (Scintilla feature 2540)</summary>
         public unsafe void AnnotationSetText(int line, string text)
         {
-            fixed (byte* textPtr = Encoding.UTF8.GetBytes(text))
+            fixed (byte* textPtr = text.ToBytes())
             {
                 IntPtr res = Win32.SendMessage(scintilla, SciMsg.SCI_ANNOTATIONSETTEXT, line, (IntPtr)textPtr);
             }

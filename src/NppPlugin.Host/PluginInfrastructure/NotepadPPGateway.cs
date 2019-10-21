@@ -26,15 +26,23 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         // }
     }
 
-    public static class Npp
+    public static partial class Extensions
     {
-        public static NotepadPPGateway Editor { get { return PluginBase.Editor; } }
+        public static int SendMessage(this ScintillaGateway scintilla, SciMsg Msg, int wParam, int lParam)
+            => (int)Win32.SendMessage(scintilla.Handle, Msg, wParam, lParam);
 
-        public static ScintillaGateway CurrentDocument
-            => (ScintillaGateway)PluginBase.GetCurrentDocument();
+        public static int SendMessage(this ScintillaGateway scintilla, SciMsg Msg, int wParam, IntPtr lParam)
+            => (int)Win32.SendMessage(scintilla.Handle, Msg, wParam, lParam);
 
-        public static IntPtr SendMenuCommand(NppMenuCmd command)
-            => Win32.SendMessage(Npp.Editor.Handle, (uint)NppMsg.NPPM_MENUCOMMAND, 0, NppMenuCmd.IDM_FILE_NEW);
+        public static int SendMessage(this ScintillaGateway scintilla, SciMsg Msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam)
+            => (int)Win32.SendMessage(scintilla.Handle, Msg, wParam, lParam);
+
+        public static void SendMessage(this NotepadPPGateway editor, NppMsg Msg, int wParam, out string lParam, int expectedSize = 2000)
+        {
+            var path = new StringBuilder(expectedSize);
+            Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_GETFULLCURRENTPATH, path.Capacity, path);
+            lParam = path.ToString();
+        }
 
         /// <summary>
         /// Gets all text of the current document.
@@ -42,24 +50,14 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         static public string GetAllText(this ScintillaGateway scintilla)
             => scintilla.GetText(scintilla.GetTextLength() + 1);
 
-        [DllImport("user32")]
-        static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
+        public static int SendMessage(this NotepadPPGateway editor, NppMsg Msg, int wParam, int lParam)
+            => (int)Win32.SendMessage(editor.Handle, Msg, wParam, lParam);
 
-        /// <summary>
-        /// Gets the current screen location of the caret.
-        /// </summary>
-        /// <returns><c>Point</c> representing the coordinates of the screen location.</returns>
-        static public Point GetCaretScreenLocation()
-        {
-            IntPtr sci = Npp.CurrentDocument.Handle;
-            int pos = (int)Win32.SendMessage(sci, SciMsg.SCI_GETCURRENTPOS, 0, 0);
-            int x = (int)Win32.SendMessage(sci, SciMsg.SCI_POINTXFROMPOSITION, 0, pos);
-            int y = (int)Win32.SendMessage(sci, SciMsg.SCI_POINTYFROMPOSITION, 0, pos);
+        public static IntPtr SendMenuCommand(this NotepadPPGateway editor, NppMenuCmd command)
+            => Win32.SendMessage(editor.Handle, (uint)NppMsg.NPPM_MENUCOMMAND, 0, NppMenuCmd.IDM_FILE_NEW);
 
-            Point point = new Point(x, y);
-            ClientToScreen(sci, ref point);
-            return point;
-        }
+        static public void SelectAll(this ScintillaGateway document)
+            => document.SetSel(0, document.GetLength());
 
         /// <summary>
         /// Gets the text between two text positions.
@@ -67,16 +65,14 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <param name="start">The start position.</param>
         /// <param name="end">The end position.</param>
         /// <returns></returns>
-        static public string GetTextBetween(int start, int end = -1)
+        static public string GetTextBetween(this ScintillaGateway sci, int start, int end = -1)
         {
-            IntPtr sci = Npp.CurrentDocument.Handle;
-
             if (end == -1)
-                end = (int)Win32.SendMessage(sci, SciMsg.SCI_GETLENGTH, 0, 0);
+                end = sci.SendMessage(SciMsg.SCI_GETLENGTH, 0, 0);
 
             using (var tr = new TextRange(start, end, end - start + 1)) //+1 for null termination
             {
-                Win32.SendMessage(sci, SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
+                sci.SendMessage(SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
                 return tr.lpstrText;
             }
         }
@@ -86,11 +82,10 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// </summary>
         /// <param name="maxLength">The maximum length.</param>
         /// <returns></returns>
-        static public string TextBeforeCaret(int maxLength = 512)
+        static public string TextBeforeCaret(this ScintillaGateway document, int maxLength = 512)
         {
             int bufCapacity = maxLength + 1;
-            IntPtr hCurrentEditView = Npp.CurrentDocument.Handle;
-            int currentPos = (int)Win32.SendMessage(hCurrentEditView, SciMsg.SCI_GETCURRENTPOS, 0, 0);
+            int currentPos = document.SendMessage(SciMsg.SCI_GETCURRENTPOS, 0, 0);
             int beginPos = currentPos - maxLength;
             int startPos = (beginPos > 0) ? beginPos : 0;
             int size = currentPos - startPos;
@@ -99,7 +94,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
             {
                 using (var tr = new TextRange(startPos, currentPos, bufCapacity))
                 {
-                    Win32.SendMessage(hCurrentEditView, SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
+                    document.SendMessage(SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
                     return tr.lpstrText;
                 }
             }
@@ -112,15 +107,13 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// </summary>
         /// <param name="point">The point - start and end position of the word.</param>
         /// <returns></returns>
-        static public string GetWordAtCursor(out Point point)
+        static public string GetWordAtCursor(this ScintillaGateway document, out Point point)
         {
-            IntPtr sci = Npp.CurrentDocument.Handle;
+            int currentPos = document.SendMessage(SciMsg.SCI_GETCURRENTPOS, 0, 0);
+            int fullLength = document.SendMessage(SciMsg.SCI_GETLENGTH, 0, 0);
 
-            int currentPos = (int)Win32.SendMessage(sci, SciMsg.SCI_GETCURRENTPOS, 0, 0);
-            int fullLength = (int)Win32.SendMessage(sci, SciMsg.SCI_GETLENGTH, 0, 0);
-
-            string leftText = Npp.TextBeforeCaret(512);
-            string rightText = Npp.TextAfterCaret(512);
+            string leftText = document.TextBeforeCaret(512);
+            string rightText = document.TextAfterCaret(512);
 
             var delimiters = "\t\n\r .,:;'\"[]{}()".ToCharArray();
 
@@ -152,17 +145,15 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// Replaces the word at cursor.
         /// </summary>
         /// <param name="replacement">The replacement.</param>
-        static public void ReplaceWordAtCursor(string replacement)
+        static public void ReplaceWordAtCursor(this ScintillaGateway document, string replacement)
         {
-            IntPtr sci = Npp.CurrentDocument.Handle;
-
             Point p;
-            string word = Npp.GetWordAtCursor(out p);
+            string word = Npp.Document.GetWordAtCursor(out p);
 
             if (!string.IsNullOrWhiteSpace(word))
-                Win32.SendMessage(sci, SciMsg.SCI_SETSELECTION, p.X, p.Y);
+                document.SendMessage(SciMsg.SCI_SETSELECTION, p.X, p.Y);
 
-            Win32.SendMessage(sci, SciMsg.SCI_REPLACESEL, 0, replacement);
+            document.SendMessage(SciMsg.SCI_REPLACESEL, 0, replacement);
         }
 
         /// <summary>
@@ -173,18 +164,23 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         // {
         //     Win32.SendMessage(Npp.CurrentScintilla, SciMsg.SCI_SETTEXT, 0, text);
         // }
+        static public void SelectWorAtCaret(this ScintillaGateway document)
+        {
+            Point p;
+            document.GetWordAtCursor(out p);
+            document.SendMessage(SciMsg.SCI_SETSELECTION, p.X, p.Y);
+        }
 
         /// <summary>
         /// Returns text after the current caret position.
         /// </summary>
         /// <param name="maxLength">The maximum length.</param>
         /// <returns></returns>
-        static public string TextAfterCaret(int maxLength = 512)
+        static public string TextAfterCaret(this ScintillaGateway document, int maxLength = 512)
         {
             int bufCapacity = maxLength + 1;
-            IntPtr sci = Npp.CurrentDocument.Handle;
-            int currentPos = (int)Win32.SendMessage(sci, SciMsg.SCI_GETCURRENTPOS, 0, 0);
-            int fullLength = (int)Win32.SendMessage(sci, SciMsg.SCI_GETLENGTH, 0, 0);
+            int currentPos = document.SendMessage(SciMsg.SCI_GETCURRENTPOS, 0, 0);
+            int fullLength = document.SendMessage(SciMsg.SCI_GETLENGTH, 0, 0);
             int startPos = currentPos;
             int endPos = Math.Min(currentPos + bufCapacity, fullLength);
             int size = endPos - startPos;
@@ -193,12 +189,39 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
             {
                 using (var tr = new TextRange(startPos, endPos, bufCapacity))
                 {
-                    Win32.SendMessage(sci, SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
+                    document.SendMessage(SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
                     return tr.lpstrText;
                 }
             }
             else
                 return null;
+        }
+    }
+
+    public static class Npp
+    {
+        public static NotepadPPGateway Editor { get { return PluginBase.Editor; } }
+
+        public static ScintillaGateway Document
+            => (ScintillaGateway)PluginBase.GetCurrentDocument();
+
+        [DllImport("user32")]
+        static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
+
+        /// <summary>
+        /// Gets the current screen location of the caret.
+        /// </summary>
+        /// <returns><c>Point</c> representing the coordinates of the screen location.</returns>
+        static public Point GetCaretScreenLocation()
+        {
+            IntPtr sci = Npp.Document.Handle;
+            int pos = (int)Win32.SendMessage(sci, SciMsg.SCI_GETCURRENTPOS, 0, 0);
+            int x = (int)Win32.SendMessage(sci, SciMsg.SCI_POINTXFROMPOSITION, 0, pos);
+            int y = (int)Win32.SendMessage(sci, SciMsg.SCI_POINTYFROMPOSITION, 0, pos);
+
+            Point point = new Point(x, y);
+            ClientToScreen(sci, ref point);
+            return point;
         }
     }
 
