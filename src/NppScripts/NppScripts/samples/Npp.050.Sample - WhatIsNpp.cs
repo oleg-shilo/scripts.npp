@@ -1,6 +1,5 @@
-//css_dir C:\Program Files\Notepad++\plugins\NppScripts
-//css_ref NppScripts.dll
-//css_ref NppScripts\NppScripts.asm.dll
+//css_ref C:\Program Files\Notepad++\plugins\NppScripts\NppScripts.dll
+//css_ref C:\Program Files\Notepad++\plugins\NppScripts\NppScripts\NppScripts.asm.dll
 using System.Threading.Tasks;
 using System.Threading;
 using System;

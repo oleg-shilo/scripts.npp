@@ -1,4 +1,3 @@
-using CSScriptLibrary;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,31 +8,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using CSScriptLibrary;
 
 namespace NppScripts
 {
-    public class ZipArchiveTest
-    {
-        public static void Test()
-        {
-            using (var zip = ZipArchive.OpenOnFile(@"E:\<>\Projects\CS-Script.Npp\NppScripts\bin\Plugins\NppScripts\samples.zip"))
-            {
-                var arr = zip.Files.OrderBy(file => file.Name).Select(file => file.Name).ToArray();
-                foreach (var name in arr)
-                {
-                    var data = zip.GetFile(name);
-                    if (data.FolderFlag) continue;
-
-                    //var text = new StreamReader(data.GetStream().Wr).ReadToEnd();
-                    using (var fileStream = new FileStream(@"E:\<>\Projects\CS-Script.Npp\NppScripts\bin\Plugins\NppScripts\www\" + name, FileMode.Create))
-                    {
-                        data.GetStream().CopyTo(fileStream);
-                    }
-                }
-            }
-        }
-    }
-
     //http://www.codeproject.com/Articles/209731/Csharp-use-Zip-archives-without-external-libraries
     class ZipArchive : IDisposable
     {

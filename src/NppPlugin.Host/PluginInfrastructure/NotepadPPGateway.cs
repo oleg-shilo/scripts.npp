@@ -15,28 +15,52 @@ namespace NppScripts
 namespace Kbg.NppPluginNET.PluginInfrastructure
 #endif
 {
-    static public class ScintillaGatewayExtensions
-    {
-        // int fullLength = (int)Win32.SendMessage(Npp.CurrentDocument.Handle, SciMsg.SCI_GETLENGTH, 0, 0);
-        // using (var tr = new Sci_TextRange(0, fullLength, fullLength + 1))
-        // {
-        //     Win32.SendMessage(Npp.CurrentScintilla, SciMsg.SCI_GETTEXTRANGE, 0, tr.NativePointer);
-        //     return tr.lpstrText;
-        // }
-        // }
-    }
-
+    /// <summary>
+    ///
+    /// </summary>
     public static partial class Extensions
     {
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="scintilla">The scintilla.</param>
+        /// <param name="Msg">The MSG.</param>
+        /// <param name="wParam">The w parameter.</param>
+        /// <param name="lParam">The l parameter.</param>
+        /// <returns></returns>
         public static int SendMessage(this ScintillaGateway scintilla, SciMsg Msg, int wParam, int lParam)
             => (int)Win32.SendMessage(scintilla.Handle, Msg, wParam, lParam);
 
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="scintilla">The scintilla.</param>
+        /// <param name="Msg">The MSG.</param>
+        /// <param name="wParam">The w parameter.</param>
+        /// <param name="lParam">The l parameter.</param>
+        /// <returns></returns>
         public static int SendMessage(this ScintillaGateway scintilla, SciMsg Msg, int wParam, IntPtr lParam)
             => (int)Win32.SendMessage(scintilla.Handle, Msg, wParam, lParam);
 
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="scintilla">The scintilla.</param>
+        /// <param name="Msg">The MSG.</param>
+        /// <param name="wParam">The w parameter.</param>
+        /// <param name="lParam">The l parameter.</param>
+        /// <returns></returns>
         public static int SendMessage(this ScintillaGateway scintilla, SciMsg Msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam)
             => (int)Win32.SendMessage(scintilla.Handle, Msg, wParam, lParam);
 
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="editor">The editor.</param>
+        /// <param name="Msg">The MSG.</param>
+        /// <param name="wParam">The w parameter.</param>
+        /// <param name="lParam">The l parameter.</param>
+        /// <param name="expectedSize">The expected size.</param>
         public static void SendMessage(this NotepadPPGateway editor, NppMsg Msg, int wParam, out string lParam, int expectedSize = 2000)
         {
             var path = new StringBuilder(expectedSize);
@@ -50,18 +74,37 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         static public string GetAllText(this ScintillaGateway scintilla)
             => scintilla.GetText(scintilla.GetTextLength() + 1);
 
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="editor">The editor.</param>
+        /// <param name="Msg">The MSG.</param>
+        /// <param name="wParam">The w parameter.</param>
+        /// <param name="lParam">The l parameter.</param>
+        /// <returns></returns>
         public static int SendMessage(this NotepadPPGateway editor, NppMsg Msg, int wParam, int lParam)
             => (int)Win32.SendMessage(editor.Handle, Msg, wParam, lParam);
 
+        /// <summary>
+        /// Sends the menu command.
+        /// </summary>
+        /// <param name="editor">The editor.</param>
+        /// <param name="command">The command.</param>
+        /// <returns></returns>
         public static IntPtr SendMenuCommand(this NotepadPPGateway editor, NppMenuCmd command)
             => Win32.SendMessage(editor.Handle, (uint)NppMsg.NPPM_MENUCOMMAND, 0, NppMenuCmd.IDM_FILE_NEW);
 
+        /// <summary>
+        /// Selects all.
+        /// </summary>
+        /// <param name="document">The document.</param>
         static public void SelectAll(this ScintillaGateway document)
             => document.SetSel(0, document.GetLength());
 
         /// <summary>
         /// Gets the text between two text positions.
         /// </summary>
+        /// <param name="sci">The scintilla object.</param>
         /// <param name="start">The start position.</param>
         /// <param name="end">The end position.</param>
         /// <returns></returns>
@@ -80,6 +123,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>
         /// Get text before caret.
         /// </summary>
+        /// <param name="document">The scintilla object.</param>
         /// <param name="maxLength">The maximum length.</param>
         /// <returns></returns>
         static public string TextBeforeCaret(this ScintillaGateway document, int maxLength = 512)
@@ -105,6 +149,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>
         /// Gets the word at cursor.
         /// </summary>
+        /// <param name="document">The scintilla object.</param>
         /// <param name="point">The point - start and end position of the word.</param>
         /// <returns></returns>
         static public string GetWordAtCursor(this ScintillaGateway document, out Point point)
@@ -144,6 +189,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>
         /// Replaces the word at cursor.
         /// </summary>
+        /// <param name="document">The document.</param>
         /// <param name="replacement">The replacement.</param>
         static public void ReplaceWordAtCursor(this ScintillaGateway document, string replacement)
         {
@@ -157,13 +203,9 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         }
 
         /// <summary>
-        /// Sets the all text of the current document.
+        /// Selects the wor at caret.
         /// </summary>
-        /// <param name="text">The text.</param>
-        // static public void SetAllText(string text)
-        // {
-        //     Win32.SendMessage(Npp.CurrentScintilla, SciMsg.SCI_SETTEXT, 0, text);
-        // }
+        /// <param name="document">The document.</param>
         static public void SelectWorAtCaret(this ScintillaGateway document)
         {
             Point p;
@@ -174,6 +216,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>
         /// Returns text after the current caret position.
         /// </summary>
+        /// <param name="document">The scintilla object.</param>
         /// <param name="maxLength">The maximum length.</param>
         /// <returns></returns>
         static public string TextAfterCaret(this ScintillaGateway document, int maxLength = 512)
@@ -198,10 +241,25 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public static class Npp
     {
+        /// <summary>
+        /// Gets the editor object representing Notepad++ environment.
+        /// </summary>
+        /// <value>
+        /// The editor.
+        /// </value>
         public static NotepadPPGateway Editor { get { return PluginBase.Editor; } }
 
+        /// <summary>
+        /// Gets the Scintilla document object.
+        /// </summary>
+        /// <value>
+        /// The document.
+        /// </value>
         public static ScintillaGateway Document
             => (ScintillaGateway)PluginBase.GetCurrentDocument();
 
@@ -225,16 +283,39 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public interface INotepadPPGateway
     {
+        /// <summary>
+        /// Invokes "New File" menu item.
+        /// </summary>
+        /// <returns></returns>
         NotepadPPGateway FileNew();
 
+        /// <summary>
+        /// Gets the current file path.
+        /// </summary>
+        /// <returns></returns>
         string GetCurrentFilePath();
 
+        /// <summary>
+        /// Gets the file path of a specific document buffer (Notepad++ tab).
+        /// </summary>
+        /// <param name="bufferId">The buffer identifier.</param>
+        /// <returns></returns>
         unsafe string GetFilePath(int bufferId);
 
+        /// <summary>
+        /// Sets the current language.
+        /// </summary>
+        /// <param name="language">The language.</param>
+        /// <returns></returns>
         NotepadPPGateway SetCurrentLanguage(LangType language);
     }
+
+#pragma warning disable 1591
 
     /// <summary>
     /// This class holds helpers for sending messages defined in the Msgs_h.cs file. It is at the moment
@@ -242,6 +323,12 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
     /// </summary>
     public class NotepadPPGateway : INotepadPPGateway
     {
+        /// <summary>
+        /// Gets the handle.
+        /// </summary>
+        /// <value>
+        /// The handle.
+        /// </value>
         public IntPtr Handle { get { return PluginBase.nppData._nppHandle; } }
 
         private const int Unused = 0;

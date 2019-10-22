@@ -13,11 +13,18 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
     {
         static byte[] emptyStringBytes = new byte[] { 0 };
 
+        /// <summary>
+        /// Converts string to UTF8 bytes array.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns></returns>
         public static byte[] ToBytes(this string text)
             => string.IsNullOrEmpty(text) ?
                 emptyStringBytes :
                 Encoding.UTF8.GetBytes(text);
     }
+
+#pragma warning disable 1591
 
     /// <summary>
     /// This it the plugin-writers primary interface to Notepad++/Scintilla.
@@ -3240,7 +3247,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
 
         /// <summary>
         /// Change the way control characters are displayed:
-        /// If symbol is < 32, keep the drawn way, else, use the given character.
+        /// If symbol is &lt;32, keep the drawn way, else, use the given character.
         /// (Scintilla feature 2388)
         /// </summary>
         public void SetControlCharSymbol(int symbol)

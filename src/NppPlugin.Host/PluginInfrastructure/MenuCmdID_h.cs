@@ -5,6 +5,8 @@
 // found at
 // https://github.com/notepad-plus-plus/notepad-plus-plus/blob/master/PowerEditor/src/menuCmdID.h
 
+#pragma warning disable 1591
+
 #if nppscripts
 
 namespace NppScripts

@@ -2,6 +2,8 @@
 using System;
 using System.Windows.Forms;
 
+#pragma warning disable 1591
+
 #if nppscripts
 
 namespace NppScripts

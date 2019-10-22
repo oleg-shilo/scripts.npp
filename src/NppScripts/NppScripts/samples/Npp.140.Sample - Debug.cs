@@ -1,3 +1,5 @@
+//css_ref C:\Program Files\Notepad++\plugins\NppScripts\NppScripts.dll
+//css_ref C:\Program Files\Notepad++\plugins\NppScripts\NppScripts\NppScripts.asm.dll
 using System;
 using System.Windows.Forms;
 using NppScripts;

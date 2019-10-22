@@ -21,9 +21,10 @@ namespace Kbg.NppPluginNET
         ─ Program Files (x86)
         └─ Notepad++
             └─ plugins
-                ├─ MyPlugin
-                |  └─ MyPlugin.dll <AnyCPU assembly>
-                └─ MyPlugin.dll <renamed x86 version of NppPlugin.Host.dll>
+               └─ MyPlugin
+                  ├─ MyPlugin
+                  |  └─ MyPlugin.dll <AnyCPU assembly>
+                  └─ MyPlugin.dll <renamed x86 version of NppPlugin.Host.dll>
 
         ************************
 
@@ -31,9 +32,10 @@ namespace Kbg.NppPluginNET
         ─ Program Files
         └─ Notepad++
             └─ plugins
-                ├─ MyPlugin
-                |  └─ MyPlugin.dll <AnyCPU assembly>
-                └─ MyPlugin.dll <renamed x64 version of NppPlugin.Host.dll>
+               └─ MyPlugin
+                  ├─ MyPlugin
+                  |  └─ MyPlugin.dll <AnyCPU assembly>
+                  └─ MyPlugin.dll <renamed x64 version of NppPlugin.Host.dll>
 
         ```
 
@@ -44,6 +46,8 @@ namespace Kbg.NppPluginNET
         And at runtime this host assembly calls at startup the plugin's NppPluginBinder.bind method to
         solve the reversed CLR dependency.
      */
+
+#pragma warning disable 1591
 
     public interface IUnmanagedExports
     {

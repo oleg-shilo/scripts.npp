@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
+#pragma warning disable 1591
+
 #if nppscripts
 
 namespace NppScripts

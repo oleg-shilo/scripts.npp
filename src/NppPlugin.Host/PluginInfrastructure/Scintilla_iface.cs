@@ -8,6 +8,8 @@
 using System;
 using System.Runtime.InteropServices;
 
+#pragma warning disable 1591
+
 #if nppscripts
 
 namespace NppScripts
@@ -1878,7 +1880,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         SCI_GETCURSOR = 2387,
 
         /// Change the way control characters are displayed:
-        /// If symbol is < 32, keep the drawn way, else, use the given character.
+        /// If symbol is &lt; 32, keep the drawn way, else, use the given character.
         SCI_SETCONTROLCHARSYMBOL = 2388,
 
         /// Get the way control characters are displayed.

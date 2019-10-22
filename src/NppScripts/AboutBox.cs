@@ -145,7 +145,6 @@ namespace NppScripts
             }
         }
 
-
         void CheckForUpdates()
         {
             string version = Product.GetLatestAvailableVersion();
@@ -201,13 +200,11 @@ namespace NppScripts
                                 //Win32.SendMenuCmd(Npp.NppHandle, NppMenuCmd.IDM_FILE_EXIT, 0);
                                 //string file;
                                 //Win32.SendMessage(Npp.NppHandle, NppMsg.NPPM_GETFULLCURRENTPATH, 0, out file);
-
                             }
                             catch
                             {
                                 MessageBox.Show("Cannot execute setup file: " + msiFile, "Notepad++ Automation");
                             }
-
                         }
                         else
                         {
@@ -238,6 +235,7 @@ namespace NppScripts
         }
 
         int blinkingCount = 0;
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (updateCheckBtn.Text.StartsWith("Downloading"))
@@ -252,7 +250,7 @@ namespace NppScripts
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string samplesBackup = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), @"NppScripts\samples.zip");
+            string samplesBackup = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), @"samples.zip");
 
             if (File.Exists(samplesBackup))
             {

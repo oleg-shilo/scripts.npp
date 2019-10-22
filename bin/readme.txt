@@ -5,7 +5,7 @@
 The plugin requires .NET 4.0 or higher.
 
 2. Installation
-To install plugin unpack the content of the NppScripts.zip in the Notepad++ plugin directory.
+To install plugin unpack the content of the NppScripts.7z in the Notepad++ plugin directory.
 
 3. Usage
   a. Open Script Manager from Notepad++ menu: 'Plugins'->'Automation Scripts'->'Script Manager'.
@@ -15,4 +15,4 @@ To install plugin unpack the content of the NppScripts.zip in the Notepad++ plug
      Or press the shortcut combination associated with the script.
      
 It is highly recommended that you test the sample scripts, which come with the plugin.
-See www.csscript.net/npp/nppscript.html for more details
+See https://github.com/oleg-shilo/scripts.npp/wiki for more details

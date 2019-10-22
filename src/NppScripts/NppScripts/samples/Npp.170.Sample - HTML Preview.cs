@@ -1,5 +1,5 @@
 //npp_toolbar_image Shell32.dll|13
-//css_ref C:\Users\oleg.shilo\Documents\NppScripts\HtmlView.exe;
+//css_ref %userprofile%\Documents\NppScripts\HtmlView.exe;
 //css_ref C:\Program Files\Notepad++\plugins\NppScripts\NppScripts.dll
 //css_ref C:\Program Files\Notepad++\plugins\NppScripts\NppScripts\NppScripts.asm.dll
 using System.Reflection;

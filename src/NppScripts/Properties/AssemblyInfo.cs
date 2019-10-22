@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("CS-Script")]
 [assembly: AssemblyProduct("Notepad++ Automation")]
-[assembly: AssemblyCopyright("Copyright © Oleg Shilo 2015-2016")]
+[assembly: AssemblyCopyright("Copyright © Oleg Shilo 2015-2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

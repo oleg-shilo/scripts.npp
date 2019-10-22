@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+#pragma warning disable 1591
+
 #if nppscripts
 
 namespace NppScripts

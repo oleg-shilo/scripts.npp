@@ -16,35 +16,68 @@ using Kbg.NppPluginNET.PluginInfrastructure;
 namespace Kbg.NppPluginNET
 #endif
 {
+    /// <summary>
+    /// Class that represents plugin adapter for the plugin host. This class implements standard N++ hosting interface
+    /// </summary>
     static public class PluginProxy
     {
         static IUnmanagedExports plugin;
 
+        /// <summary>
+        /// Determines whether this instance is unicode.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if this instance is unicode; otherwise, <c>false</c>.
+        /// </returns>
         public static bool isUnicode()
         {
             return plugin.isUnicode();
         }
 
+        /// <summary>
+        /// Sets the information.
+        /// </summary>
+        /// <param name="notepadPlusData">The notepad plus data.</param>
         public static void setInfo(NppData notepadPlusData)
         {
             plugin.setInfo(notepadPlusData);
         }
 
+        /// <summary>
+        /// Gets the funcs array.
+        /// </summary>
+        /// <param name="nbF">The nb f.</param>
+        /// <returns></returns>
         public static IntPtr getFuncsArray(ref int nbF)
         {
             return plugin.getFuncsArray(ref nbF);
         }
 
+        /// <summary>
+        /// Messages the proc.
+        /// </summary>
+        /// <param name="Message">The message.</param>
+        /// <param name="wParam">The w parameter.</param>
+        /// <param name="lParam">The l parameter.</param>
+        /// <returns></returns>
         public static uint messageProc(uint Message, IntPtr wParam, IntPtr lParam)
         {
             return plugin.messageProc(Message, wParam, lParam);
         }
 
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
+        /// <returns></returns>
         public static IntPtr getName()
         {
             return plugin.getName();
         }
 
+        /// <summary>
+        /// Bes the notified.
+        /// </summary>
+        /// <param name="notifyCode">The notify code.</param>
         public static void beNotified(IntPtr notifyCode)
         {
             plugin.beNotified(notifyCode);
@@ -59,6 +92,9 @@ namespace Kbg.NppPluginNET
                 return null;
         }
 
+        /// <summary>
+        /// Initializes this instance.
+        /// </summary>
         public static void Init()
         {
             string thisAssembly = Assembly.GetExecutingAssembly().Location;

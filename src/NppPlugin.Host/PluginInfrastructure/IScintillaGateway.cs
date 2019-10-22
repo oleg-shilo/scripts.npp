@@ -16,14 +16,32 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
     /// </summary>
     public interface IScintillaGateway
     {
+        /// <summary>
+        /// Gets the length of the selection.
+        /// </summary>
+        /// <returns></returns>
         int GetSelectionLength();
 
+        /// <summary>
+        /// Appends the text and move cursor.
+        /// </summary>
+        /// <param name="text">The text.</param>
         void AppendTextAndMoveCursor(string text);
 
+        /// <summary>
+        /// Inserts the text and move cursor.
+        /// </summary>
+        /// <param name="text">The text.</param>
         void InsertTextAndMoveCursor(string text);
 
+        /// <summary>
+        /// Selects the current line.
+        /// </summary>
         void SelectCurrentLine();
 
+        /// <summary>
+        /// Clears the selection to cursor.
+        /// </summary>
         void ClearSelectionToCursor();
 
         /// <summary>
@@ -1629,7 +1647,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
 
         /// <summary>
         /// Change the way control characters are displayed:
-        /// If symbol is < 32, keep the drawn way, else, use the given character.
+        /// If symbol is &lt; 32, keep the drawn way, else, use the given character.
         /// (Scintilla feature 2388)
         /// </summary>
         void SetControlCharSymbol(int symbol);

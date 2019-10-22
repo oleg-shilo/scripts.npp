@@ -7,6 +7,8 @@
 
 using System;
 
+#pragma warning disable 1591
+
 #if nppscripts
 
 namespace NppScripts
@@ -129,7 +131,7 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         NPPM_DMMUPDATEDISPINFO = Constants.NPPMSG + 32,
 
         /// <summary>
-        ///void NPPM_DMMREGASDCKDLG(0, &tTbData)
+        ///void NPPM_DMMREGASDCKDLG(0, &amp;tTbData)
         /// </summary>
         NPPM_DMMREGASDCKDLG = Constants.NPPMSG + 33,
 

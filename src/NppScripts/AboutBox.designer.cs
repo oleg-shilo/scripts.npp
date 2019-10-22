@@ -143,12 +143,13 @@
             // 
             // updateCheckBtn
             // 
-            this.updateCheckBtn.Location = new System.Drawing.Point(366, 86);
+            this.updateCheckBtn.Location = new System.Drawing.Point(366, 107);
             this.updateCheckBtn.Name = "updateCheckBtn";
             this.updateCheckBtn.Size = new System.Drawing.Size(122, 23);
             this.updateCheckBtn.TabIndex = 27;
             this.updateCheckBtn.Text = "Check for Updates...";
             this.updateCheckBtn.UseVisualStyleBackColor = true;
+            this.updateCheckBtn.Visible = false;
             this.updateCheckBtn.Click += new System.EventHandler(this.updateCheckBtn_Click);
             // 
             // linkLabel3
@@ -170,7 +171,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(366, 112);
+            this.button1.Location = new System.Drawing.Point(366, 78);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(122, 23);
             this.button1.TabIndex = 28;
