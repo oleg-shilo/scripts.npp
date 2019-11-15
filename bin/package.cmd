@@ -31,11 +31,14 @@ copy ..\src\NppPlugin.Host\bin\x86\Release\NppScripts.xml  NppScripts.x86\NppScr
 copy readme.txt                                            NppScripts.x86\readme.txt
 copy license.txt                                           NppScripts.x86\license.txt
 
-cd NppScripts.x86
-"C:\Program Files\7-Zip\7z.exe" a -t7z NppScripts.x86.zip *
-cd ..
+cd NppScripts.x86\NppScripts
+"C:\Program Files\7-Zip\7z.exe" a NppScripts.x86.zip *
+move NppScripts.x86.zip ..\NppScripts.x86.zip
+cd ..\..
 
-cd NppScripts.x64
-"C:\Program Files\7-Zip\7z.exe" a -t7z NppScripts.x64.zip *
+cd NppScripts.x64\NppScripts
+"C:\Program Files\7-Zip\7z.exe" a NppScripts.x64.zip *
+move NppScripts.x64.zip ..\NppScripts.x64.zip
+cd ..\..
 
 pause
